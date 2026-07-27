@@ -21,6 +21,7 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 Implementação do MVP amplo concluída (Sprints 1–12).
 
 - **Concluído:** Sprints 1–12 (tools MCP, docs, skill e plugins Codex/Cursor).
+- **Pós-MVP (planejado):** Incremento 7 — MCP remoto single-user via Cloudflare Workers (acesso mobile).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
 - Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
@@ -287,3 +288,79 @@ Menor entregável validável: instalar o plugin em Codex **ou** em Cursor dispon
 5. Checklist manual cruzado: leitura via MCP nos dois hosts; escrita só com `confirm: true`; nenhum segredo em logs/exemplos.
 
 Critério de aceite: nos dois hosts, instalar o plugin disponibiliza skill + MCP; credenciais só por env/variables do usuário; validações Codex e Cursor passam; o núcleo MCP permanece único.
+
+### Incremento 7 — MCP remoto (Cloudflare Workers, single-user)
+
+Objetivo: disponibilizar o mesmo MCP via HTTPS para acesso fora do desktop (ex.: celular no Cursor), sem exigir Node.js local, mantendo modelo single-user e reutilizando o núcleo de tools existente.
+
+Contexto: o transporte stdio atual exige processo local (`node dist/index.js`). Em dispositivos móveis isso não escala; um Worker remoto com Streamable HTTP permite configurar apenas URL + Bearer no `mcp.json`.
+
+Decisões de recorte:
+
+- Abordagem **híbrida**: manter stdio para dev/local; adicionar entrypoint HTTP no Worker para uso remoto.
+- **Single-tenant**: um Worker por usuário; sem OAuth/multi-user no primeiro entregável.
+- Credenciais Habitica ficam em **Cloudflare Secrets** (`HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT`); o celular carrega apenas `MCP_AUTH_TOKEN` (Bearer).
+- Transporte remoto: **Streamable HTTP** em `/mcp` (padrão atual para MCP remoto no Cursor).
+- Sessões MCP stateful via **Durable Object** (Streamable HTTP exige estado de sessão).
+- Segurança em camadas: Bearer obrigatório; Cloudflare Access (email OTP) recomendado; rate limiting no Worker.
+- Manter `confirm: true` em todas as tools de escrita (sem mudança de contrato).
+- Limitar lotes em `habitica_create_day_plan` no Worker para evitar timeout de CPU.
+
+Configuração alvo no celular/desktop remoto:
+
+```json
+{
+  "mcpServers": {
+    "habitica": {
+      "url": "https://habitica-mcp.<subdominio>.workers.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer ${MCP_AUTH_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+#### Sprint 13 — Núcleo MCP reutilizável (stdio + HTTP)
+
+**Status:** Pendente
+
+Menor entregável validável: o registro de tools e o cliente Habitica ficam desacoplados do transporte; stdio continua funcionando como hoje.
+
+1. Extrair bootstrap das tools para módulo compartilhado (ex.: `src/mcp-server.ts`).
+2. Manter `src/index.ts` como entrypoint stdio sem regressão.
+3. Criar `src/worker.ts` (ou equivalente) preparado para receber transporte HTTP.
+4. Garantir que testes existentes continuem passando sem API real.
+5. Documentar a separação transporte vs. domínio no `docs/operations.md`.
+
+Critério de aceite: `pnpm check` passa; stdio local inalterado; o núcleo de tools pode ser importado por um entrypoint Worker.
+
+#### Sprint 14 — Worker single-user com Streamable HTTP
+
+**Status:** Pendente
+
+Menor entregável validável: deploy em Cloudflare Workers expõe `/mcp` com autenticação Bearer e as tools atuais respondendo via Habitica API.
+
+1. Adicionar `wrangler.toml` e scripts de deploy (`wrangler deploy`).
+2. Implementar validação de `Authorization: Bearer <MCP_AUTH_TOKEN>` em todas as rotas MCP.
+3. Integrar transporte Streamable HTTP do `@modelcontextprotocol/sdk` com Durable Object para sessão.
+4. Mapear secrets do Wrangler para credenciais Habitica no runtime do Worker.
+5. Aplicar limite de itens por chamada em `habitica_create_day_plan` (ex.: máx. 10).
+6. Smoke remoto: `habitica_list_items` e `habitica_create_todo` com `confirm: true`.
+
+Critério de aceite: Cursor conecta via URL remota; sem Bearer válido retorna 401; com Bearer válido as tools respondem; token Habitica não aparece em respostas/logs.
+
+#### Sprint 15 — Hardening, mobile e documentação remota
+
+**Status:** Pendente
+
+Menor entregável validável: uso recorrente no celular com checklist de segurança, rollback e operação documentados.
+
+1. Configurar rate limiting no Worker (proteção contra abuso da URL pública).
+2. Avaliar Cloudflare Access (email OTP) como camada adicional opcional.
+3. Validar fluxo ponta a ponta no Cursor mobile: leitura → preview → escrita com `confirm`.
+4. Atualizar plugins/README com modo remoto (`url` + `headers`) além do modo stdio local.
+5. Documentar rotação de `MCP_AUTH_TOKEN`, revogação de token Habitica e rollback (desativar Worker).
+6. Checklist de release remoto: deploy, teste mobile, monitoramento de erros 401/429/5xx.
+
+Critério de aceite: documentação permite configurar o MCP remoto no celular sem Node local; checklist cobre segurança, validação mobile e rollback; modo stdio local permanece suportado para desenvolvimento.

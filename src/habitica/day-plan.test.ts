@@ -2,13 +2,15 @@ import { describe, expect, it } from "vitest";
 import { buildDayPlanPreview } from "./day-plan.js";
 
 describe("buildDayPlanPreview", () => {
-  it("gera lote com marcador de origem", () => {
+  it("gera lote com marcador de origem e slug", () => {
     const preview = buildDayPlanPreview([
       { titulo: "Item A", origem: "obsidian", prioridade: "alta" },
       { titulo: "Item B", origem: "github" },
     ]);
     expect(preview.items).toHaveLength(2);
+    expect(preview.items[0]?.slug).toBe("item-a");
     expect(preview.items[0]?.payload.notes).toContain("[origem:obsidian]");
+    expect(preview.items[0]?.payload.notes).toContain("[slug:item-a]");
     expect(preview.items[0]?.payload.priority).toBe(2);
     expect(preview.rejected).toHaveLength(0);
   });

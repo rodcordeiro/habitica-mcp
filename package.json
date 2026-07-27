@@ -20,6 +20,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test",
+    "inspect": "node scripts/inspect-cli.mjs",
+    "inspect:ui": "pnpm dlx @modelcontextprotocol/inspector node dist/index.js",
     "prepare": "husky"
   },
   "engines": {
@@ -52,7 +54,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "*.{json,md,yml,yaml}": [

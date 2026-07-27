@@ -75,6 +75,10 @@ server.registerTool(
       "Monta o preview do payload para criar um afazer (todo) no Habitica, sem chamar a API de escrita.",
     inputSchema: {
       titulo: z.string().describe("Título do afazer (obrigatório)."),
+      slug: z
+        .string()
+        .optional()
+        .describe("Slug kebab-case. Se omitido, é gerado automaticamente a partir do título."),
       notas: z.string().optional().describe("Notas opcionais."),
       dificuldade: dificuldadeSchema
         .optional()
@@ -105,9 +109,13 @@ server.registerTool(
   "habitica_create_todo",
   {
     description:
-      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna o mesmo preview de habitica_preview_todo.",
+      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna o mesmo preview de habitica_preview_todo. Sempre inclui slug (informado ou gerado do título).",
     inputSchema: {
       titulo: z.string().describe("Título do afazer (obrigatório)."),
+      slug: z
+        .string()
+        .optional()
+        .describe("Slug kebab-case. Se omitido, é gerado automaticamente a partir do título."),
       notas: z.string().optional().describe("Notas opcionais."),
       dificuldade: dificuldadeSchema
         .optional()
@@ -153,7 +161,7 @@ server.registerTool(
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify({ mode: "created", item }, null, 2),
+            text: JSON.stringify({ mode: "created", item, slug: preview.item.slug }, null, 2),
           },
         ],
       };
@@ -173,6 +181,7 @@ server.registerTool(
         .array(
           z.object({
             titulo: z.string(),
+            slug: z.string().optional(),
             notas: z.string().optional(),
             origem: z.string().optional(),
             prioridade: z.enum(["baixa", "media", "alta"]).optional(),
@@ -209,6 +218,7 @@ server.registerTool(
         .array(
           z.object({
             titulo: z.string(),
+            slug: z.string().optional(),
             notas: z.string().optional(),
             origem: z.string().optional(),
             prioridade: z.enum(["baixa", "media", "alta"]).optional(),

@@ -5,9 +5,12 @@ const MAX_TITULO = 200;
 const MAX_NOTAS = 2000;
 const MAX_TAGS = 20;
 const MAX_TAG_LEN = 50;
+const MAX_SLUG = 80;
+const SLUG_MARKER_RE = /\[slug:[^\]]+\]/g;
 
 export interface TodoInput {
   titulo: string;
+  slug?: string;
   notas?: string;
   dificuldade?: Dificuldade | string;
   data_limite?: string;
@@ -30,6 +33,7 @@ export interface TodoPreviewResult {
   item: {
     tipo: "todo";
     titulo: string;
+    slug: string;
     notas: string;
     dificuldade: Dificuldade;
     data_limite: string | null;
@@ -38,11 +42,67 @@ export interface TodoPreviewResult {
 }
 
 /**
+ * Gera slug kebab-case a partir de um título (ASCII, sem acentos).
+ */
+export function slugifyTitulo(titulo: string): string {
+  const base = titulo
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-")
+    .slice(0, MAX_SLUG)
+    .replace(/-+$/g, "");
+  return base.length > 0 ? base : "item";
+}
+
+/**
+ * Valida slug informado ou gera a partir do título.
+ */
+export function resolveSlug(titulo: string, slug?: string): string {
+  if (slug === undefined || slug === null || String(slug).trim() === "") {
+    return slugifyTitulo(titulo);
+  }
+  const trimmed = String(slug).trim().toLowerCase();
+  if (trimmed.length > MAX_SLUG) {
+    throw new Error(`Campo slug excede ${MAX_SLUG} caracteres.`);
+  }
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(trimmed)) {
+    throw new Error("Campo slug inválido. Use kebab-case (a-z, 0-9 e hífens), sem acentos.");
+  }
+  return trimmed;
+}
+
+/**
+ * Injeta/atualiza marcador [slug:...] nas notas.
+ */
+export function appendSlugMarker(notas: string, slug: string): string {
+  const cleaned = notas.replace(SLUG_MARKER_RE, "").trim();
+  const marker = `[slug:${slug}]`;
+  return cleaned.length > 0 ? `${cleaned}\n${marker}` : marker;
+}
+
+/**
+ * Extrai slug do marcador nas notas, se existir.
+ */
+export function extractSlugFromNotas(notas: string): string | null {
+  const match = notas.match(/\[slug:([^\]]+)\]/);
+  return match?.[1] ?? null;
+}
+
+/**
  * Valida campos de afazer e monta o payload Habitica (sem chamar a API).
+ * Todo afazer recebe `slug` (informado ou gerado do título) embutido nas notas.
  */
 export function buildTodoPreview(input: TodoInput): TodoPreviewResult {
   const titulo = requireNonEmptyString(input.titulo, "titulo", MAX_TITULO);
-  const notas = optionalString(input.notas, "notas", MAX_NOTAS) ?? "";
+  const slug = resolveSlug(titulo, input.slug);
+  const notasBase = optionalString(input.notas, "notas", MAX_NOTAS) ?? "";
+  const notas = appendSlugMarker(notasBase, slug);
+  if (notas.length > MAX_NOTAS) {
+    throw new Error(`Campo notas excede ${MAX_NOTAS} caracteres após incluir o slug.`);
+  }
   const dificuldade = parseDificuldade(input.dificuldade ?? "easy");
   const dataLimite = optionalDate(input.data_limite);
   const tags = optionalTags(input.tags);
@@ -66,6 +126,7 @@ export function buildTodoPreview(input: TodoInput): TodoPreviewResult {
     item: {
       tipo: "todo",
       titulo,
+      slug,
       notas,
       dificuldade,
       data_limite: dataLimite ?? null,

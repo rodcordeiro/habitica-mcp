@@ -4,6 +4,7 @@ const MAX_DAY_PLAN_ITEMS = 15;
 
 export interface DayPlanItemInput {
   titulo: string;
+  slug?: string;
   notas?: string;
   origem?: string;
   prioridade?: "baixa" | "media" | "alta";
@@ -11,6 +12,7 @@ export interface DayPlanItemInput {
 
 export interface DayPlanPreviewItem {
   titulo: string;
+  slug: string;
   notas: string;
   origem: string;
   prioridade: "baixa" | "media" | "alta";
@@ -55,6 +57,7 @@ export function buildDayPlanPreview(items: DayPlanItemInput[]): DayPlanPreviewRe
         prioridade === "alta" ? "hard" : prioridade === "baixa" ? "trivial" : "easy";
       const preview = buildTodoPreview({
         titulo: raw.titulo,
+        slug: raw.slug,
         notas,
         dificuldade,
       });
@@ -65,6 +68,7 @@ export function buildDayPlanPreview(items: DayPlanItemInput[]): DayPlanPreviewRe
       seen.add(key);
       accepted.push({
         titulo: preview.item.titulo,
+        slug: preview.item.slug,
         notas: preview.item.notas,
         origem,
         prioridade,

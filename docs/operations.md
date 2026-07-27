@@ -93,6 +93,27 @@ pnpm start
 }
 ```
 
+## Validação com MCP Inspector
+
+Requer `pnpm build` e `.env` preenchido. O wrapper carrega credenciais do `.env` sem imprimi-las.
+
+```bash
+# UI (browser)
+pnpm run inspect:ui
+
+# CLI — listar tools
+pnpm run inspect -- --method tools/list
+
+# CLI — leitura real
+pnpm run inspect -- --method tools/call --tool-name habitica_list_items --tool-arg tipo=todo
+
+# CLI — preview (sem escrita)
+pnpm run inspect -- --method tools/call --tool-name habitica_preview_todo --tool-arg titulo=Validacao-Inspector
+pnpm run inspect -- --method tools/call --tool-name habitica_create_todo --tool-arg titulo=Validacao-Inspector --tool-arg confirm=false
+```
+
+Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no Windows; use a UI para esses casos.
+
 ## Checklist de validação manual
 
 1. Sem `.env` / variáveis: servidor falha cedo sem imprimir segredos.

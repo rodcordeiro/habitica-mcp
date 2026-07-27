@@ -20,7 +20,7 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 Implementação em andamento.
 
-- **Concluído:** Sprint 1 (leitura ponta a ponta), Sprint 2 (robustez de leitura).
+- **Concluído:** Sprint 1 (leitura ponta a ponta), Sprint 2 (robustez de leitura), Sprint 3 (preview de afazer).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
 - Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
@@ -80,6 +80,8 @@ Critério de aceite: os testes cobrem mapeamento e erros principais, e a documen
 Objetivo: permitir que agentes criem afazeres no Habitica sem executar mudanças por acidente.
 
 #### Sprint 3 — Preview de criação de afazer
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: uma tool recebe campos explícitos de um afazer e devolve o preview do payload que seria enviado, sem chamar a API de escrita.
 

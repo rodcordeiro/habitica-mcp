@@ -5,6 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { loadConfig, redactSecrets } from "./config.js";
 import { HabiticaClient } from "./habitica/client.js";
+import { buildTodoPreview } from "./habitica/todo.js";
 import type { ItemTipo } from "./types.js";
 
 loadEnv();
@@ -17,6 +18,16 @@ const server = new McpServer({
 });
 
 const tipoSchema = z.enum(["habit", "daily", "todo", "reward"]);
+const dificuldadeSchema = z.enum(["trivial", "easy", "medium", "hard"]);
+
+function toolError(err: unknown) {
+  const raw = err instanceof Error ? err.message : String(err);
+  const message = redactSecrets(raw);
+  return {
+    content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
+    isError: true as const,
+  };
+}
 
 server.registerTool(
   "habitica_list_items",
@@ -51,18 +62,45 @@ server.registerTool(
         ],
       };
     } catch (err) {
-      const raw = err instanceof Error ? err.message : String(err);
-      const message = redactSecrets(raw);
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_preview_todo",
+  {
+    description:
+      "Monta o preview do payload para criar um afazer (todo) no Habitica, sem chamar a API de escrita.",
+    inputSchema: {
+      titulo: z.string().describe("Título do afazer (obrigatório)."),
+      notas: z.string().optional().describe("Notas opcionais."),
+      dificuldade: dificuldadeSchema
+        .optional()
+        .describe("trivial|easy|medium|hard. Default: easy."),
+      data_limite: z.string().optional().describe("Data limite YYYY-MM-DD ou ISO."),
+      tags: z.array(z.string()).optional().describe("Lista de tags (nomes)."),
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildTodoPreview(args);
       return {
-        content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
-        isError: true,
+        content: [{ type: "text" as const, text: JSON.stringify(preview, null, 2) }],
       };
+    } catch (err) {
+      return toolError(err);
     }
   },
 );
 
 async function main(): Promise<void> {
-  // Valida config na subida para falhar cedo (sem imprimir segredos).
   loadConfig();
   const transport = new StdioServerTransport();
   await server.connect(transport);

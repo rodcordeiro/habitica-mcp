@@ -1,8 +1,8 @@
 import type { HabiticaConfig } from "../config.js";
 import { redactSecrets } from "../config.js";
-import type { HabiticaTask, ItemTipo } from "../types.js";
-import { mapTasksToItems } from "./mapper.js";
-import type { ItemExecucao } from "../types.js";
+import type { HabiticaTask, ItemExecucao, ItemTipo } from "../types.js";
+import { mapTaskToItem, mapTasksToItems } from "./mapper.js";
+import type { HabiticaTodoCreatePayload } from "./todo.js";
 
 const BASE_URL = "https://habitica.com/api/v3";
 
@@ -124,6 +124,26 @@ export class HabiticaClient {
       items = items.filter((item) => item.ativo === ativo);
     }
     return items;
+  }
+
+  async getTask(id: string): Promise<ItemExecucao> {
+    const data = await this.request<HabiticaTask>(`/tasks/${encodeURIComponent(id)}`);
+    return mapTaskToItem(data);
+  }
+
+  async createTodo(payload: HabiticaTodoCreatePayload): Promise<ItemExecucao> {
+    const data = await this.request<HabiticaTask>("/tasks/user", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return mapTaskToItem(data);
+  }
+
+  async scoreTask(id: string, direction: "up" | "down"): Promise<unknown> {
+    return this.request(`/tasks/${encodeURIComponent(id)}/score/${direction}`, {
+      method: "POST",
+      body: "{}",
+    });
   }
 }
 

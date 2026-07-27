@@ -4,11 +4,7 @@ export interface HabiticaConfig {
   xClient: string;
 }
 
-const REQUIRED = [
-  "HABITICA_USER_ID",
-  "HABITICA_API_TOKEN",
-  "HABITICA_X_CLIENT",
-] as const;
+const REQUIRED = ["HABITICA_USER_ID", "HABITICA_API_TOKEN", "HABITICA_X_CLIENT"] as const;
 
 /**
  * Carrega credenciais do ambiente. Falha cedo sem ecoar valores secretos.
@@ -16,9 +12,7 @@ const REQUIRED = [
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): HabiticaConfig {
   const missing = REQUIRED.filter((key) => !env[key]?.trim());
   if (missing.length > 0) {
-    throw new Error(
-      `Configuração Habitica incompleta. Defina: ${missing.join(", ")}.`,
-    );
+    throw new Error(`Configuração Habitica incompleta. Defina: ${missing.join(", ")}.`);
   }
 
   return {

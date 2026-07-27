@@ -11,26 +11,37 @@ loadEnv();
 
 const server = new McpServer({
   name: "habitica-mcp",
-  "description": "MCP server for Habitica daily execution items",
+  description: "MCP server for Habitica daily execution items",
   version: "0.1.0",
-  icons:[{ src:"https://habitica.com/static/presskit/Logo/Android.png"}] 
+  icons: [{ src: "https://habitica.com/static/presskit/Logo/Android.png" }],
 });
 
 const tipoSchema = z.enum(["habit", "daily", "todo", "reward"]);
 
-server.tool(
+server.registerTool(
   "habitica_list_items",
-  "Lista itens de execução do Habitica (habits, dailies, todos, rewards) normalizados. Não expõe credenciais.",
   {
-    tipo: tipoSchema
-      .optional()
-      .describe("Filtra por tipo de item. Omitir para listar todos."),
+    description:
+      "Lista itens de execução do Habitica (habits, dailies, todos, rewards) normalizados. Não expõe credenciais.",
+    inputSchema: {
+      tipo: tipoSchema.optional().describe("Filtra por tipo de item. Omitir para listar todos."),
+      ativo: z
+        .boolean()
+        .optional()
+        .describe("Filtra por ativo (true) ou inativo/concluído (false). Omitir para ambos."),
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
   },
-  async ({ tipo }) => {
+  async ({ tipo, ativo }) => {
     try {
       const config = loadConfig();
       const client = new HabiticaClient(config);
-      const items = await client.listTasks(tipo as ItemTipo | undefined);
+      const items = await client.listTasks(tipo as ItemTipo | undefined, ativo);
       return {
         content: [
           {

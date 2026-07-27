@@ -104,10 +104,11 @@ export class HabiticaClient {
   }
 
   /**
-   * Lista tasks do usuário. `type` opcional: habits | dailys | todos | rewards
-   * (nomes da API Habitica).
+   * Lista tasks do usuário.
+   * @param type filtro por tipo de domínio
+   * @param ativo se definido, filtra por item.ativo (completed → inativo)
    */
-  async listTasks(type?: ItemTipo): Promise<ItemExecucao[]> {
+  async listTasks(type?: ItemTipo, ativo?: boolean): Promise<ItemExecucao[]> {
     const apiType = type ? toApiTypeParam(type) : undefined;
     const qs = apiType ? `?type=${apiType}` : "";
     const data = await this.request<HabiticaTask[]>(`/tasks/user${qs}`);
@@ -118,7 +119,11 @@ export class HabiticaClient {
         "invalid_response",
       );
     }
-    return mapTasksToItems(data);
+    let items = mapTasksToItems(data);
+    if (ativo !== undefined) {
+      items = items.filter((item) => item.ativo === ativo);
+    }
+    return items;
   }
 }
 

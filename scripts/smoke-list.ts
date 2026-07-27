@@ -9,13 +9,7 @@ import type { ItemTipo } from "../src/types.js";
 
 loadEnv();
 
-const tipos: Array<ItemTipo | undefined> = [
-  undefined,
-  "habit",
-  "daily",
-  "todo",
-  "reward",
-];
+const tipos: Array<ItemTipo | undefined> = [undefined, "habit", "daily", "todo", "reward"];
 
 async function run(): Promise<void> {
   const config = loadConfig();

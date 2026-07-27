@@ -8,10 +8,10 @@ Agentes consultam e (com confirmação explícita) alteram hábitos, diárias, a
 
 Documentação do roadmap pronta. **Implementação ainda não iniciada.**
 
-| Camada | Escopo |
-| --- | --- |
-| MVP amplo | Incrementos 1–6 — ver [docs/backlog.md](docs/backlog.md) |
-| MVP mínimo validável | Incremento 1 (somente leitura) |
+| Camada               | Escopo                                                   |
+| -------------------- | -------------------------------------------------------- |
+| MVP amplo            | Incrementos 1–6 — ver [docs/backlog.md](docs/backlog.md) |
+| MVP mínimo validável | Incremento 1 (somente leitura)                           |
 
 ## Stack prevista
 
@@ -63,25 +63,25 @@ Exemplo de configuração MCP (stdio), a validar após o scaffold:
 
 ## Tools planejadas (não implementadas)
 
-| Tool | Incremento | Função |
-| --- | --- | --- |
-| `habitica_list_items` | 1 | Listar itens de execução (leitura) |
-| `habitica_preview_todo` | 2 | Preview de criação de afazer |
-| `habitica_create_todo` | 2 | Criar afazer (`confirm: true`) |
-| `habitica_preview_day_plan` | 3 | Preview do plano do dia |
-| `habitica_create_day_plan` | 3 | Criar lote do plano do dia (`confirm: true`) |
-| `habitica_complete_todo` | 4 | Concluir afazer (`confirm: true`) |
-| Pontuar `habit` / `daily` | 4 | Progresso com confirmação e direção explícita |
-| Skill `habitica-rpg` | 6 | Ensina quando/como usar cada tool |
-| Plugin Codex `habitica-rpg` | 6 | Empacota skill + MCP |
+| Tool                        | Incremento | Função                                        |
+| --------------------------- | ---------- | --------------------------------------------- |
+| `habitica_list_items`       | 1          | Listar itens de execução (leitura)            |
+| `habitica_preview_todo`     | 2          | Preview de criação de afazer                  |
+| `habitica_create_todo`      | 2          | Criar afazer (`confirm: true`)                |
+| `habitica_preview_day_plan` | 3          | Preview do plano do dia                       |
+| `habitica_create_day_plan`  | 3          | Criar lote do plano do dia (`confirm: true`)  |
+| `habitica_complete_todo`    | 4          | Concluir afazer (`confirm: true`)             |
+| Pontuar `habit` / `daily`   | 4          | Progresso com confirmação e direção explícita |
+| Skill `habitica-rpg`        | 6          | Ensina quando/como usar cada tool             |
+| Plugin Codex `habitica-rpg` | 6          | Empacota skill + MCP                          |
 
 Critérios de aceite e sprints: [docs/backlog.md](docs/backlog.md).
 
 ## Documentação
 
-| Arquivo | Papel |
-| --- | --- |
-| [CONTEXT.md](CONTEXT.md) | Glossário e limites de domínio |
+| Arquivo                            | Papel                                  |
+| ---------------------------------- | -------------------------------------- |
+| [CONTEXT.md](CONTEXT.md)           | Glossário e limites de domínio         |
 | [docs/backlog.md](docs/backlog.md) | Roadmap do MVP (incrementos e sprints) |
 
 ## Próximo passo

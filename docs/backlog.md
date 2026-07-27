@@ -20,15 +20,15 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 Implementação em andamento.
 
-- **Concluído:** Sprint 1 (leitura ponta a ponta).
+- **Concluído:** Sprint 1 (leitura ponta a ponta), Sprint 2 (robustez de leitura).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
 - Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
-- Distribuição prevista: plugin Codex `habitica-rpg` empacotando skill + servidor MCP.
+- Distribuição prevista: plugins `habitica-rpg` para **Codex** e **Cursor**, ambos empacotando a mesma skill + servidor MCP.
 
 ## Decisões de recorte
 
-- O MVP amplo cobre leitura, escrita segura, planejamento do dia, ações de execução, operação/distribuição e empacotamento em plugin Codex (skill + MCP).
+- O MVP amplo cobre leitura, escrita segura, planejamento do dia, ações de execução, operação/distribuição e empacotamento em plugins Codex e Cursor (skill + MCP).
 - O primeiro entregável validável é somente leitura (Incremento 1).
 - O conceito interno do MCP é `Item de execução`.
 - `Task do Habitica` é tratado como conceito externo da API.
@@ -36,8 +36,9 @@ Implementação em andamento.
 - Escrita entra apenas depois da leitura ponta a ponta.
 - A primeira escrita será criar afazer (`todo`), com `preview` por padrão e `confirm: true` para executar.
 - A ferramenta de planejamento do dia fica fora do MVP mínimo e entra no Incremento 3.
-- A skill ensina quando/como usar cada tool MCP e os limites de domínio; o plugin instala skill + MCP juntos.
-- O código do MCP vive em `scripts/habitica-mcp/` dentro do plugin (ou é apontado por `.mcp.json` para o build local).
+- A skill ensina quando/como usar cada tool MCP e os limites de domínio; os plugins Codex e Cursor instalam skill + MCP juntos.
+- O código/build do MCP é compartilhado (`scripts/habitica-mcp/`); cada plugin só declara manifesto + apontamento MCP + skill (conteúdo único, copiado ou linkado).
+- Credenciais nunca vão no repositório: Codex via `${...}` no `.mcp.json`; Cursor via `variables` no manifesto + `${...}` no `mcp.json` (valores em Plugins → Configure).
 - Glossário e limites de domínio vivem apenas em `CONTEXT.md` (não duplicar no backlog; a skill referencia o CONTEXT).
 
 ## Backlog
@@ -61,6 +62,8 @@ Menor entregável validável: uma tool MCP lista itens de execução do Habitica
 Critério de aceite: com variáveis válidas, a tool retorna itens reais; com variáveis ausentes, falha cedo com erro claro e sem imprimir segredos.
 
 #### Sprint 2 — Robustez de leitura
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: a leitura continua previsível diante de filtros, erros comuns e respostas inesperadas.
 
@@ -184,30 +187,50 @@ Menor entregável validável: o projeto tem comandos padronizados de verificaç�
 
 Critério de aceite: uma versão candidata pode ser validada localmente com testes offline e checklist operacional.
 
-### Incremento 6 — Skill e plugin Codex
+### Incremento 6 — Skill e plugins (Codex + Cursor)
 
-Objetivo: ensinar agentes a usar cada tool do MCP com segurança e distribuir skill + MCP como um único plugin Codex.
+Objetivo: ensinar agentes a usar cada tool do MCP com segurança e distribuir skill + MCP como plugins instaláveis no **Codex** e no **Cursor**, reutilizando o mesmo núcleo MCP e o mesmo conteúdo de skill.
 
-Estrutura-alvo do plugin `habitica-rpg`:
+Estrutura-alvo (dois wrappers, um núcleo):
 
 ```text
-habitica-rpg/
-  .codex-plugin/
-    plugin.json
-  .mcp.json
-  skills/
-    habitica-rpg/
-      SKILL.md
-  scripts/
-    habitica-mcp/
-      ...
-  assets/
-    ...
+plugins/
+  habitica-rpg-codex/
+    .codex-plugin/
+      plugin.json
+    .mcp.json
+    skills/
+      habitica-rpg/
+        SKILL.md
+    scripts/
+      habitica-mcp/
+    assets/
+  habitica-rpg-cursor/
+    .cursor-plugin/
+      plugin.json
+    mcp.json
+    skills/
+      habitica-rpg/
+        SKILL.md
+    scripts/
+      habitica-mcp/
+    assets/
+    README.md
 ```
+
+Mapeamento Codex ↔ Cursor:
+
+| Peça      | Codex                         | Cursor                                              |
+| --------- | ----------------------------- | --------------------------------------------------- |
+| Manifesto | `.codex-plugin/plugin.json`   | `.cursor-plugin/plugin.json`                        |
+| MCP       | `.mcp.json`                   | `mcp.json`                                          |
+| Skills    | `skills/*/SKILL.md`           | `skills/*/SKILL.md`                                 |
+| Segredos  | `${HABITICA_*}` no env do MCP | `variables` + `${HABITICA_*}` (Plugins → Configure) |
+| Validação | `validate_plugin.py`          | `~/.cursor/plugins/local` + checklist marketplace   |
 
 #### Sprint 11 — Skill de uso das tools MCP
 
-Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o MCP, como interagir com cada tool e quais anti-padrões evitar.
+Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o MCP, como interagir com cada tool e quais anti-padrões evitar — conteúdo portável para Codex e Cursor.
 
 1. Criar `skills/habitica-rpg/SKILL.md` com frontmatter (`name`, `description`) e gatilhos de uso.
 2. Documentar o fluxo recomendado: leitura → preview → confirmação explícita → escrita.
@@ -220,19 +243,27 @@ Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o
 4. Explicitar limites de domínio: Habitica ≠ backlog de projeto; nunca logar credenciais/tokens/cookies/`Authorization`.
 5. Incluir exemplos de prompts e sequências de chamada sem dados sensíveis reais.
 6. Alinhar a skill com `CONTEXT.md` (termos e anti-termos).
+7. Manter uma **fonte única** da skill (ou script de sincronização) para os wrappers Codex e Cursor.
 
-Critério de aceite: um agente que carrega a skill consegue escolher a tool correta, exigir `confirm: true` em escritas e recusar tratar o Habitica como gerenciador de projeto.
+Critério de aceite: um agente (Codex ou Cursor) que carrega a skill consegue escolher a tool correta, exigir `confirm: true` em escritas e recusar tratar o Habitica como gerenciador de projeto.
 
-#### Sprint 12 — Plugin que encapsula skill + MCP
+#### Sprint 12 — Plugins Codex e Cursor (skill + MCP)
 
-Menor entregável validável: um plugin Codex instala a skill e registra o servidor MCP via manifesto, validado pelo scaffold oficial.
+Menor entregável validável: instalar o plugin em Codex **ou** em Cursor disponibiliza a skill e o MCP juntos, sem segredos no repositório, com o mesmo build do servidor.
 
-1. Scaffold do plugin com o criador oficial, por exemplo:
-   `python .../plugin-creator/scripts/create_basic_plugin.py habitica-rpg --with-skills --with-mcp --with-scripts --with-marketplace`
-2. Configurar `.codex-plugin/plugin.json` com `skills`, `mcpServers` e metadados de interface (`displayName`, categoria Productivity, capabilities Skills/MCP).
-3. Configurar `.mcp.json` apontando para o build do MCP em `scripts/habitica-mcp/` e injetando `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT` via `${...}` (sem segredos no repositório).
-4. Empacotar ou referenciar o código/build do servidor MCP dentro de `scripts/habitica-mcp/`.
-5. Validar com `validate_plugin.py` e checklist manual: plugin instalável, skill descoberta, tools MCP listáveis.
-6. Documentar no README do repositório (ou do plugin) instalação, atualização (cachebuster) e rollback: desinstalar plugin e revogar token se necessário.
+1. Empacotar ou referenciar o build do MCP em `scripts/habitica-mcp/` (núcleo compartilhado).
+2. **Codex**
+   1. Scaffold com o criador oficial, por exemplo:
+      `python .../plugin-creator/scripts/create_basic_plugin.py habitica-rpg --with-skills --with-mcp --with-scripts --with-marketplace`
+   2. Configurar `.codex-plugin/plugin.json` com `skills`, `mcpServers` e metadados de interface.
+   3. Configurar `.mcp.json` apontando para o build e injetando `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT` via `${...}`.
+   4. Validar com `validate_plugin.py` (sem placeholders `[TODO]`).
+3. **Cursor**
+   1. Criar `.cursor-plugin/plugin.json` (`name`: `habitica-rpg`) com `variables` para as três credenciais Habitica.
+   2. Criar `mcp.json` na raiz do plugin com `command`/`args` para o build e `env` usando `${HABITICA_USER_ID}`, `${HABITICA_API_TOKEN}`, `${HABITICA_X_CLIENT}`.
+   3. Incluir `skills/habitica-rpg/SKILL.md` (mesma fonte da Sprint 11).
+   4. Validar localmente: copiar/symlink em `~/.cursor/plugins/local/habitica-rpg`, reload, skill descoberta, tools MCP listáveis, variáveis em Plugins → Configure.
+4. Documentar no README instalação Codex, instalação Cursor, atualização e rollback (desinstalar plugin + revogar token).
+5. Checklist manual cruzado: leitura via MCP nos dois hosts; escrita só com `confirm: true`; nenhum segredo em logs/exemplos.
 
-Critério de aceite: instalar o plugin disponibiliza a skill e o MCP juntos; credenciais continuam só no ambiente; `validate_plugin.py` passa sem placeholders `[TODO]`.
+Critério de aceite: nos dois hosts, instalar o plugin disponibiliza skill + MCP; credenciais só por env/variables do usuário; validações Codex e Cursor passam; o núcleo MCP permanece único.

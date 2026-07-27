@@ -1,0 +1,30 @@
+{
+  "name": "habitica-rpg",
+  "version": "0.1.0",
+  "description": "Habitica as daily execution layer: skill + MCP tools.",
+  "author": {
+    "name": "Rodrigo Cordeiro"
+  },
+  "keywords": ["habitica", "mcp", "productivity"],
+  "variables": {
+    "type": "object",
+    "properties": {
+      "HABITICA_USER_ID": {
+        "type": "string",
+        "title": "Habitica User ID",
+        "description": "User ID from Habitica Settings → API"
+      },
+      "HABITICA_API_TOKEN": {
+        "type": "string",
+        "title": "Habitica API Token",
+        "description": "API token from Habitica Settings → API"
+      },
+      "HABITICA_X_CLIENT": {
+        "type": "string",
+        "title": "Habitica x-client",
+        "description": "Usually <user-id>-habitica-mcp"
+      }
+    },
+    "required": ["HABITICA_USER_ID", "HABITICA_API_TOKEN", "HABITICA_X_CLIENT"]
+  }
+}

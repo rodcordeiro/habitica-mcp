@@ -18,9 +18,9 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 ## Status do projeto
 
-Implementação em andamento.
+Implementação do MVP amplo concluída (Sprints 1–12).
 
-- **Concluído:** Sprint 1–4 (leitura, robustez, preview e criação confirmada de afazer).
+- **Concluído:** Sprints 1–12 (tools MCP, docs, skill e plugins Codex/Cursor).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
 - Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
@@ -113,6 +113,8 @@ Objetivo: transformar uma lista decidida de trabalho diário em afazeres do Habi
 
 #### Sprint 5 — Preview de planejamento do dia
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: a tool recebe uma lista de itens planejados e devolve um lote de afazeres que poderia ser criado no Habitica.
 
 1. Criar a tool `habitica_preview_day_plan`.
@@ -124,6 +126,8 @@ Menor entregável validável: a tool recebe uma lista de itens planejados e devo
 Critério de aceite: o agente consegue revisar um plano do dia antes de criar qualquer item no Habitica.
 
 #### Sprint 6 — Criação confirmada do plano do dia
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: a tool cria um lote pequeno de afazeres somente com confirmação explícita.
 
@@ -141,6 +145,8 @@ Objetivo: permitir concluir ou pontuar itens com proteções explícitas, depois
 
 #### Sprint 7 — Concluir afazeres
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: a tool conclui um `todo` específico somente com confirmação explícita.
 
 1. Criar a tool `habitica_complete_todo`.
@@ -152,6 +158,8 @@ Menor entregável validável: a tool conclui um `todo` específico somente com c
 Critério de aceite: apenas afazeres são concluídos, e nenhuma pontuação ocorre sem confirmação explícita.
 
 #### Sprint 8 — Pontuar hábitos e diárias
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: tools pontuam `habit` ou `daily` com confirmação e direção explícita quando aplicável.
 
@@ -169,6 +177,8 @@ Objetivo: preparar o MCP para uso recorrente sem depender de conhecimento tribal
 
 #### Sprint 9 — Documentação operacional
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: um usuário consegue instalar, configurar e validar o MCP localmente seguindo a documentação.
 
 1. Documentar instalação, variáveis de ambiente e execução local.
@@ -180,6 +190,8 @@ Menor entregável validável: um usuário consegue instalar, configurar e valida
 Critério de aceite: a documentação permite validar o fluxo completo sem expor tokens ou depender de explicação oral.
 
 #### Sprint 10 — Qualidade de entrega
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: o projeto tem comandos padronizados de verificação e uma versão candidata local.
 
@@ -234,6 +246,8 @@ Mapeamento Codex ↔ Cursor:
 
 #### Sprint 11 — Skill de uso das tools MCP
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o MCP, como interagir com cada tool e quais anti-padrões evitar — conteúdo portável para Codex e Cursor.
 
 1. Criar `skills/habitica-rpg/SKILL.md` com frontmatter (`name`, `description`) e gatilhos de uso.
@@ -252,6 +266,8 @@ Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o
 Critério de aceite: um agente (Codex ou Cursor) que carrega a skill consegue escolher a tool correta, exigir `confirm: true` em escritas e recusar tratar o Habitica como gerenciador de projeto.
 
 #### Sprint 12 — Plugins Codex e Cursor (skill + MCP)
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: instalar o plugin em Codex **ou** em Cursor disponibiliza a skill e o MCP juntos, sem segredos no repositório, com o mesmo build do servidor.
 

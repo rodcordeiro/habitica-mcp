@@ -18,11 +18,12 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 ## Status do projeto
 
-Documentação do roadmap alinhada. Implementação pendente.
+Implementação em andamento.
 
+- **Concluído:** Sprint 1 (leitura ponta a ponta).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
-- Stack prevista: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
+- Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
 - Distribuição prevista: plugin Codex `habitica-rpg` empacotando skill + servidor MCP.
 
 ## Decisões de recorte
@@ -46,6 +47,8 @@ Documentação do roadmap alinhada. Implementação pendente.
 Objetivo: provar que um agente consegue consultar o Habitica por MCP com autenticação segura, contrato claro e saída normalizada.
 
 #### Sprint 1 — Leitura ponta a ponta
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: uma tool MCP lista itens de execução do Habitica por tipo e retorna JSON normalizado sem expor credenciais.
 

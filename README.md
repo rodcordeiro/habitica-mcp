@@ -6,20 +6,20 @@ Agentes consultam e (com confirmação explícita) alteram hábitos, diárias, a
 
 ## Status
 
-Documentação do roadmap pronta. **Implementação ainda não iniciada.**
+MVP amplo implementado (Sprints 1–12): tools MCP, docs operacionais, skill e plugins Codex/Cursor.
 
-| Camada | Escopo |
-| --- | --- |
-| MVP amplo | Incrementos 1–6 — ver [docs/backlog.md](docs/backlog.md) |
-| MVP mínimo validável | Incremento 1 (somente leitura) |
+| Camada               | Escopo                                                   |
+| -------------------- | -------------------------------------------------------- |
+| MVP amplo            | Incrementos 1–6 — ver [docs/backlog.md](docs/backlog.md) |
+| MVP mínimo validável | Incremento 1 (somente leitura) — concluído               |
 
-## Stack prevista
+## Stack
 
 - Node.js + TypeScript
 - `@modelcontextprotocol/sdk`
 - Transporte **stdio**
 - Gerenciador de pacotes **pnpm**
-- Distribuição: plugin Codex `habitica-rpg` (skill + MCP)
+- Plugins: `plugins/habitica-rpg-codex` e `plugins/habitica-rpg-cursor`
 
 ## Fronteira do produto
 
@@ -27,63 +27,66 @@ Documentação do roadmap pronta. **Implementação ainda não iniciada.**
 - MCP = ponte segura para agentes (leitura primeiro; escrita só com `confirm: true`).
 - Não importar backlog completo de projeto para o Habitica.
 
-Detalhes de linguagem e anti-termos: [CONTEXT.md](CONTEXT.md).
+Detalhes: [CONTEXT.md](CONTEXT.md).
 
 ## Segurança
 
-- Credenciais apenas em variáveis de ambiente (fora do repositório).
+- Credenciais apenas em variáveis de ambiente (fora do repositório). Use `.env` local (gitignored) a partir de `.env.example`.
 - Nunca registrar tokens, cookies, `Authorization`, payloads sensíveis ou credenciais em notas, logs, exemplos ou testes.
-- Variáveis previstas: `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT`.
+- Variáveis: `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT`.
 
-## Quick start (planejado — ainda não implementado)
+## Quick start
 
 ```bash
 pnpm install
-# Definir HABITICA_USER_ID, HABITICA_API_TOKEN e HABITICA_X_CLIENT no ambiente
-pnpm start
+cp .env.example .env   # preencha as três variáveis (sem commitar)
+pnpm run build
+pnpm start             # ou: pnpm dev
+pnpm check             # typecheck + lint + format + test
 ```
 
-Exemplo de configuração MCP (stdio), a validar após o scaffold:
+Smoke: `pnpm exec tsx scripts/smoke-list.ts`
+
+### Configuração MCP (stdio)
 
 ```json
 {
   "mcpServers": {
     "habitica": {
-      "command": "pnpm",
-      "args": ["exec", "tsx", "src/index.ts"],
+      "command": "node",
+      "args": ["dist/index.js"],
+      "cwd": "<caminho-do-repo>",
       "env": {
         "HABITICA_USER_ID": "<seu-user-id>",
         "HABITICA_API_TOKEN": "<seu-api-token>",
-        "HABITICA_X_CLIENT": "<app-name-ou-email>"
+        "HABITICA_X_CLIENT": "<user-id>-habitica-mcp"
       }
     }
   }
 }
 ```
 
-## Tools planejadas (não implementadas)
+## Tools
 
-| Tool | Incremento | Função |
-| --- | --- | --- |
-| `habitica_list_items` | 1 | Listar itens de execução (leitura) |
-| `habitica_preview_todo` | 2 | Preview de criação de afazer |
-| `habitica_create_todo` | 2 | Criar afazer (`confirm: true`) |
-| `habitica_preview_day_plan` | 3 | Preview do plano do dia |
-| `habitica_create_day_plan` | 3 | Criar lote do plano do dia (`confirm: true`) |
-| `habitica_complete_todo` | 4 | Concluir afazer (`confirm: true`) |
-| Pontuar `habit` / `daily` | 4 | Progresso com confirmação e direção explícita |
-| Skill `habitica-rpg` | 6 | Ensina quando/como usar cada tool |
-| Plugin Codex `habitica-rpg` | 6 | Empacota skill + MCP |
-
-Critérios de aceite e sprints: [docs/backlog.md](docs/backlog.md).
+| Tool                        | Função                   | Escrita         |
+| --------------------------- | ------------------------ | --------------- |
+| `habitica_list_items`       | Listar itens             | não             |
+| `habitica_preview_todo`     | Preview de afazer        | não             |
+| `habitica_create_todo`      | Criar afazer             | `confirm: true` |
+| `habitica_preview_day_plan` | Preview do plano do dia  | não             |
+| `habitica_create_day_plan`  | Criar lote do dia        | `confirm: true` |
+| `habitica_complete_todo`    | Concluir afazer          | `confirm: true` |
+| `habitica_score_habit`      | Pontuar hábito up/down   | `confirm: true` |
+| `habitica_score_daily`      | Concluir/desfazer diária | `confirm: true` |
 
 ## Documentação
 
-| Arquivo | Papel |
-| --- | --- |
-| [CONTEXT.md](CONTEXT.md) | Glossário e limites de domínio |
-| [docs/backlog.md](docs/backlog.md) | Roadmap do MVP (incrementos e sprints) |
-
-## Próximo passo
-
-Implementar o Incremento 1 — Sprint 1: esqueleto MCP + tool `habitica_list_items`.
+| Arquivo                                                      | Papel                              |
+| ------------------------------------------------------------ | ---------------------------------- |
+| [CONTEXT.md](CONTEXT.md)                                     | Glossário e limites de domínio     |
+| [docs/backlog.md](docs/backlog.md)                           | Roadmap / status das sprints       |
+| [docs/operations.md](docs/operations.md)                     | Instalação, exemplos, checklist    |
+| [docs/release.md](docs/release.md)                           | Qualidade, consumo local, rollback |
+| [skills/habitica-rpg/SKILL.md](skills/habitica-rpg/SKILL.md) | Skill (fonte)                      |
+| [plugins/habitica-rpg-codex](plugins/habitica-rpg-codex)     | Plugin Codex                       |
+| [plugins/habitica-rpg-cursor](plugins/habitica-rpg-cursor)   | Plugin Cursor                      |

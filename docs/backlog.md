@@ -18,16 +18,18 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 ## Status do projeto
 
-Documentação do roadmap alinhada. Implementação pendente.
+Implementação do MVP amplo concluída (Sprints 1–12).
 
+- **Concluído:** Sprints 1–12 (tools MCP, docs, skill e plugins Codex/Cursor).
+- **Pós-MVP (planejado):** Incremento 7 — MCP remoto single-user via Cloudflare Workers (acesso mobile).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
-- Stack prevista: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
-- Distribuição prevista: plugin Codex `habitica-rpg` empacotando skill + servidor MCP.
+- Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
+- Distribuição prevista: plugins `habitica-rpg` para **Codex** e **Cursor**, ambos empacotando a mesma skill + servidor MCP.
 
 ## Decisões de recorte
 
-- O MVP amplo cobre leitura, escrita segura, planejamento do dia, ações de execução, operação/distribuição e empacotamento em plugin Codex (skill + MCP).
+- O MVP amplo cobre leitura, escrita segura, planejamento do dia, ações de execução, operação/distribuição e empacotamento em plugins Codex e Cursor (skill + MCP).
 - O primeiro entregável validável é somente leitura (Incremento 1).
 - O conceito interno do MCP é `Item de execução`.
 - `Task do Habitica` é tratado como conceito externo da API.
@@ -35,8 +37,9 @@ Documentação do roadmap alinhada. Implementação pendente.
 - Escrita entra apenas depois da leitura ponta a ponta.
 - A primeira escrita será criar afazer (`todo`), com `preview` por padrão e `confirm: true` para executar.
 - A ferramenta de planejamento do dia fica fora do MVP mínimo e entra no Incremento 3.
-- A skill ensina quando/como usar cada tool MCP e os limites de domínio; o plugin instala skill + MCP juntos.
-- O código do MCP vive em `scripts/habitica-mcp/` dentro do plugin (ou é apontado por `.mcp.json` para o build local).
+- A skill ensina quando/como usar cada tool MCP e os limites de domínio; os plugins Codex e Cursor instalam skill + MCP juntos.
+- O código/build do MCP é compartilhado (`scripts/habitica-mcp/`); cada plugin só declara manifesto + apontamento MCP + skill (conteúdo único, copiado ou linkado).
+- Credenciais nunca vão no repositório: Codex via `${...}` no `.mcp.json`; Cursor via `variables` no manifesto + `${...}` no `mcp.json` (valores em Plugins → Configure).
 - Glossário e limites de domínio vivem apenas em `CONTEXT.md` (não duplicar no backlog; a skill referencia o CONTEXT).
 
 ## Backlog
@@ -46,6 +49,8 @@ Documentação do roadmap alinhada. Implementação pendente.
 Objetivo: provar que um agente consegue consultar o Habitica por MCP com autenticação segura, contrato claro e saída normalizada.
 
 #### Sprint 1 — Leitura ponta a ponta
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: uma tool MCP lista itens de execução do Habitica por tipo e retorna JSON normalizado sem expor credenciais.
 
@@ -58,6 +63,8 @@ Menor entregável validável: uma tool MCP lista itens de execução do Habitica
 Critério de aceite: com variáveis válidas, a tool retorna itens reais; com variáveis ausentes, falha cedo com erro claro e sem imprimir segredos.
 
 #### Sprint 2 — Robustez de leitura
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: a leitura continua previsível diante de filtros, erros comuns e respostas inesperadas.
 
@@ -75,6 +82,8 @@ Objetivo: permitir que agentes criem afazeres no Habitica sem executar mudanças
 
 #### Sprint 3 — Preview de criação de afazer
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: uma tool recebe campos explícitos de um afazer e devolve o preview do payload que seria enviado, sem chamar a API de escrita.
 
 1. Criar a tool `habitica_preview_todo`.
@@ -86,6 +95,8 @@ Menor entregável validável: uma tool recebe campos explícitos de um afazer e 
 Critério de aceite: a tool mostra exatamente o que seria criado, sem fazer chamada de escrita ao Habitica.
 
 #### Sprint 4 — Criação confirmada de afazer
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: a tool cria um `todo` real somente quando `confirm: true` e retorna o item criado normalizado.
 
@@ -103,6 +114,8 @@ Objetivo: transformar uma lista decidida de trabalho diário em afazeres do Habi
 
 #### Sprint 5 — Preview de planejamento do dia
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: a tool recebe uma lista de itens planejados e devolve um lote de afazeres que poderia ser criado no Habitica.
 
 1. Criar a tool `habitica_preview_day_plan`.
@@ -114,6 +127,8 @@ Menor entregável validável: a tool recebe uma lista de itens planejados e devo
 Critério de aceite: o agente consegue revisar um plano do dia antes de criar qualquer item no Habitica.
 
 #### Sprint 6 — Criação confirmada do plano do dia
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: a tool cria um lote pequeno de afazeres somente com confirmação explícita.
 
@@ -131,6 +146,8 @@ Objetivo: permitir concluir ou pontuar itens com proteções explícitas, depois
 
 #### Sprint 7 — Concluir afazeres
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: a tool conclui um `todo` específico somente com confirmação explícita.
 
 1. Criar a tool `habitica_complete_todo`.
@@ -142,6 +159,8 @@ Menor entregável validável: a tool conclui um `todo` específico somente com c
 Critério de aceite: apenas afazeres são concluídos, e nenhuma pontuação ocorre sem confirmação explícita.
 
 #### Sprint 8 — Pontuar hábitos e diárias
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: tools pontuam `habit` ou `daily` com confirmação e direção explícita quando aplicável.
 
@@ -159,6 +178,8 @@ Objetivo: preparar o MCP para uso recorrente sem depender de conhecimento tribal
 
 #### Sprint 9 — Documentação operacional
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: um usuário consegue instalar, configurar e validar o MCP localmente seguindo a documentação.
 
 1. Documentar instalação, variáveis de ambiente e execução local.
@@ -171,6 +192,8 @@ Critério de aceite: a documentação permite validar o fluxo completo sem expor
 
 #### Sprint 10 — Qualidade de entrega
 
+**Status:** Concluída (2026-07-27)
+
 Menor entregável validável: o projeto tem comandos padronizados de verificação e uma versão candidata local.
 
 1. Padronizar scripts de lint, test e build.
@@ -181,30 +204,52 @@ Menor entregável validável: o projeto tem comandos padronizados de verificaç�
 
 Critério de aceite: uma versão candidata pode ser validada localmente com testes offline e checklist operacional.
 
-### Incremento 6 — Skill e plugin Codex
+### Incremento 6 — Skill e plugins (Codex + Cursor)
 
-Objetivo: ensinar agentes a usar cada tool do MCP com segurança e distribuir skill + MCP como um único plugin Codex.
+Objetivo: ensinar agentes a usar cada tool do MCP com segurança e distribuir skill + MCP como plugins instaláveis no **Codex** e no **Cursor**, reutilizando o mesmo núcleo MCP e o mesmo conteúdo de skill.
 
-Estrutura-alvo do plugin `habitica-rpg`:
+Estrutura-alvo (dois wrappers, um núcleo):
 
 ```text
-habitica-rpg/
-  .codex-plugin/
-    plugin.json
-  .mcp.json
-  skills/
-    habitica-rpg/
-      SKILL.md
-  scripts/
-    habitica-mcp/
-      ...
-  assets/
-    ...
+plugins/
+  habitica-rpg-codex/
+    .codex-plugin/
+      plugin.json
+    .mcp.json
+    skills/
+      habitica-rpg/
+        SKILL.md
+    scripts/
+      habitica-mcp/
+    assets/
+  habitica-rpg-cursor/
+    .cursor-plugin/
+      plugin.json
+    mcp.json
+    skills/
+      habitica-rpg/
+        SKILL.md
+    scripts/
+      habitica-mcp/
+    assets/
+    README.md
 ```
+
+Mapeamento Codex ↔ Cursor:
+
+| Peça      | Codex                         | Cursor                                              |
+| --------- | ----------------------------- | --------------------------------------------------- |
+| Manifesto | `.codex-plugin/plugin.json`   | `.cursor-plugin/plugin.json`                        |
+| MCP       | `.mcp.json`                   | `mcp.json`                                          |
+| Skills    | `skills/*/SKILL.md`           | `skills/*/SKILL.md`                                 |
+| Segredos  | `${HABITICA_*}` no env do MCP | `variables` + `${HABITICA_*}` (Plugins → Configure) |
+| Validação | `validate_plugin.py`          | `~/.cursor/plugins/local` + checklist marketplace   |
 
 #### Sprint 11 — Skill de uso das tools MCP
 
-Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o MCP, como interagir com cada tool e quais anti-padrões evitar.
+**Status:** Concluída (2026-07-27)
+
+Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o MCP, como interagir com cada tool e quais anti-padrões evitar — conteúdo portável para Codex e Cursor.
 
 1. Criar `skills/habitica-rpg/SKILL.md` com frontmatter (`name`, `description`) e gatilhos de uso.
 2. Documentar o fluxo recomendado: leitura → preview → confirmação explícita → escrita.
@@ -217,19 +262,105 @@ Menor entregável validável: uma skill `habitica-rpg` descreve quando acionar o
 4. Explicitar limites de domínio: Habitica ≠ backlog de projeto; nunca logar credenciais/tokens/cookies/`Authorization`.
 5. Incluir exemplos de prompts e sequências de chamada sem dados sensíveis reais.
 6. Alinhar a skill com `CONTEXT.md` (termos e anti-termos).
+7. Manter uma **fonte única** da skill (ou script de sincronização) para os wrappers Codex e Cursor.
 
-Critério de aceite: um agente que carrega a skill consegue escolher a tool correta, exigir `confirm: true` em escritas e recusar tratar o Habitica como gerenciador de projeto.
+Critério de aceite: um agente (Codex ou Cursor) que carrega a skill consegue escolher a tool correta, exigir `confirm: true` em escritas e recusar tratar o Habitica como gerenciador de projeto.
 
-#### Sprint 12 — Plugin que encapsula skill + MCP
+#### Sprint 12 — Plugins Codex e Cursor (skill + MCP)
 
-Menor entregável validável: um plugin Codex instala a skill e registra o servidor MCP via manifesto, validado pelo scaffold oficial.
+**Status:** Concluída (2026-07-27)
 
-1. Scaffold do plugin com o criador oficial, por exemplo:
-   `python .../plugin-creator/scripts/create_basic_plugin.py habitica-rpg --with-skills --with-mcp --with-scripts --with-marketplace`
-2. Configurar `.codex-plugin/plugin.json` com `skills`, `mcpServers` e metadados de interface (`displayName`, categoria Productivity, capabilities Skills/MCP).
-3. Configurar `.mcp.json` apontando para o build do MCP em `scripts/habitica-mcp/` e injetando `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT` via `${...}` (sem segredos no repositório).
-4. Empacotar ou referenciar o código/build do servidor MCP dentro de `scripts/habitica-mcp/`.
-5. Validar com `validate_plugin.py` e checklist manual: plugin instalável, skill descoberta, tools MCP listáveis.
-6. Documentar no README do repositório (ou do plugin) instalação, atualização (cachebuster) e rollback: desinstalar plugin e revogar token se necessário.
+Menor entregável validável: instalar o plugin em Codex **ou** em Cursor disponibiliza a skill e o MCP juntos, sem segredos no repositório, com o mesmo build do servidor.
 
-Critério de aceite: instalar o plugin disponibiliza a skill e o MCP juntos; credenciais continuam só no ambiente; `validate_plugin.py` passa sem placeholders `[TODO]`.
+1. Empacotar ou referenciar o build do MCP em `scripts/habitica-mcp/` (núcleo compartilhado).
+2. **Codex**
+   1. Scaffold com o criador oficial, por exemplo:
+      `python .../plugin-creator/scripts/create_basic_plugin.py habitica-rpg --with-skills --with-mcp --with-scripts --with-marketplace`
+   2. Configurar `.codex-plugin/plugin.json` com `skills`, `mcpServers` e metadados de interface.
+   3. Configurar `.mcp.json` apontando para o build e injetando `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT` via `${...}`.
+   4. Validar com `validate_plugin.py` (sem placeholders `[TODO]`).
+3. **Cursor**
+   1. Criar `.cursor-plugin/plugin.json` (`name`: `habitica-rpg`) com `variables` para as três credenciais Habitica.
+   2. Criar `mcp.json` na raiz do plugin com `command`/`args` para o build e `env` usando `${HABITICA_USER_ID}`, `${HABITICA_API_TOKEN}`, `${HABITICA_X_CLIENT}`.
+   3. Incluir `skills/habitica-rpg/SKILL.md` (mesma fonte da Sprint 11).
+   4. Validar localmente: copiar/symlink em `~/.cursor/plugins/local/habitica-rpg`, reload, skill descoberta, tools MCP listáveis, variáveis em Plugins → Configure.
+4. Documentar no README instalação Codex, instalação Cursor, atualização e rollback (desinstalar plugin + revogar token).
+5. Checklist manual cruzado: leitura via MCP nos dois hosts; escrita só com `confirm: true`; nenhum segredo em logs/exemplos.
+
+Critério de aceite: nos dois hosts, instalar o plugin disponibiliza skill + MCP; credenciais só por env/variables do usuário; validações Codex e Cursor passam; o núcleo MCP permanece único.
+
+### Incremento 7 — MCP remoto (Cloudflare Workers, single-user)
+
+Objetivo: disponibilizar o mesmo MCP via HTTPS para acesso fora do desktop (ex.: celular no Cursor), sem exigir Node.js local, mantendo modelo single-user e reutilizando o núcleo de tools existente.
+
+Contexto: o transporte stdio atual exige processo local (`node dist/index.js`). Em dispositivos móveis isso não escala; um Worker remoto com Streamable HTTP permite configurar apenas URL + Bearer no `mcp.json`.
+
+Decisões de recorte:
+
+- Abordagem **híbrida**: manter stdio para dev/local; adicionar entrypoint HTTP no Worker para uso remoto.
+- **Single-tenant**: um Worker por usuário; sem OAuth/multi-user no primeiro entregável.
+- Credenciais Habitica ficam em **Cloudflare Secrets** (`HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT`); o celular carrega apenas `MCP_AUTH_TOKEN` (Bearer).
+- Transporte remoto: **Streamable HTTP** em `/mcp` (padrão atual para MCP remoto no Cursor).
+- Sessões MCP stateful via **Durable Object** (Streamable HTTP exige estado de sessão).
+- Segurança em camadas: Bearer obrigatório; Cloudflare Access (email OTP) recomendado; rate limiting no Worker.
+- Manter `confirm: true` em todas as tools de escrita (sem mudança de contrato).
+- Limitar lotes em `habitica_create_day_plan` no Worker para evitar timeout de CPU.
+
+Configuração alvo no celular/desktop remoto:
+
+```json
+{
+  "mcpServers": {
+    "habitica": {
+      "url": "https://habitica-mcp.<subdominio>.workers.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer ${MCP_AUTH_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+#### Sprint 13 — Núcleo MCP reutilizável (stdio + HTTP)
+
+**Status:** Pendente
+
+Menor entregável validável: o registro de tools e o cliente Habitica ficam desacoplados do transporte; stdio continua funcionando como hoje.
+
+1. Extrair bootstrap das tools para módulo compartilhado (ex.: `src/mcp-server.ts`).
+2. Manter `src/index.ts` como entrypoint stdio sem regressão.
+3. Criar `src/worker.ts` (ou equivalente) preparado para receber transporte HTTP.
+4. Garantir que testes existentes continuem passando sem API real.
+5. Documentar a separação transporte vs. domínio no `docs/operations.md`.
+
+Critério de aceite: `pnpm check` passa; stdio local inalterado; o núcleo de tools pode ser importado por um entrypoint Worker.
+
+#### Sprint 14 — Worker single-user com Streamable HTTP
+
+**Status:** Pendente
+
+Menor entregável validável: deploy em Cloudflare Workers expõe `/mcp` com autenticação Bearer e as tools atuais respondendo via Habitica API.
+
+1. Adicionar `wrangler.toml` e scripts de deploy (`wrangler deploy`).
+2. Implementar validação de `Authorization: Bearer <MCP_AUTH_TOKEN>` em todas as rotas MCP.
+3. Integrar transporte Streamable HTTP do `@modelcontextprotocol/sdk` com Durable Object para sessão.
+4. Mapear secrets do Wrangler para credenciais Habitica no runtime do Worker.
+5. Aplicar limite de itens por chamada em `habitica_create_day_plan` (ex.: máx. 10).
+6. Smoke remoto: `habitica_list_items` e `habitica_create_todo` com `confirm: true`.
+
+Critério de aceite: Cursor conecta via URL remota; sem Bearer válido retorna 401; com Bearer válido as tools respondem; token Habitica não aparece em respostas/logs.
+
+#### Sprint 15 — Hardening, mobile e documentação remota
+
+**Status:** Pendente
+
+Menor entregável validável: uso recorrente no celular com checklist de segurança, rollback e operação documentados.
+
+1. Configurar rate limiting no Worker (proteção contra abuso da URL pública).
+2. Avaliar Cloudflare Access (email OTP) como camada adicional opcional.
+3. Validar fluxo ponta a ponta no Cursor mobile: leitura → preview → escrita com `confirm`.
+4. Atualizar plugins/README com modo remoto (`url` + `headers`) além do modo stdio local.
+5. Documentar rotação de `MCP_AUTH_TOKEN`, revogação de token Habitica e rollback (desativar Worker).
+6. Checklist de release remoto: deploy, teste mobile, monitoramento de erros 401/429/5xx.
+
+Critério de aceite: documentação permite configurar o MCP remoto no celular sem Node local; checklist cobre segurança, validação mobile e rollback; modo stdio local permanece suportado para desenvolvimento.

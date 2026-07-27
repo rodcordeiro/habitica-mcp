@@ -1,0 +1,18 @@
+{
+  "name": "habitica-rpg",
+  "version": "0.1.0",
+  "description": "Habitica RPG tools and skills for daily execution workflows (Codex).",
+  "author": {
+    "name": "Rodrigo Cordeiro"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Habitica RPG",
+    "shortDescription": "Use Habitica as a daily execution layer.",
+    "longDescription": "Provides skills and MCP tools to read and safely create Habitica execution items.",
+    "developerName": "Rodrigo Cordeiro",
+    "category": "Productivity",
+    "capabilities": ["Skills", "MCP", "Productivity"]
+  }
+}

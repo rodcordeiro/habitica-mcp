@@ -20,7 +20,7 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 Implementação em andamento.
 
-- **Concluído:** Sprint 1 (leitura ponta a ponta), Sprint 2 (robustez de leitura), Sprint 3 (preview de afazer).
+- **Concluído:** Sprint 1–4 (leitura, robustez, preview e criação confirmada de afazer).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
 - Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
@@ -94,6 +94,8 @@ Menor entregável validável: uma tool recebe campos explícitos de um afazer e 
 Critério de aceite: a tool mostra exatamente o que seria criado, sem fazer chamada de escrita ao Habitica.
 
 #### Sprint 4 — Criação confirmada de afazer
+
+**Status:** Concluída (2026-07-27)
 
 Menor entregável validável: a tool cria um `todo` real somente quando `confirm: true` e retorna o item criado normalizado.
 

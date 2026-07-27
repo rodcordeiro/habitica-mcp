@@ -100,6 +100,68 @@ server.registerTool(
   },
 );
 
+server.registerTool(
+  "habitica_create_todo",
+  {
+    description:
+      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna o mesmo preview de habitica_preview_todo.",
+    inputSchema: {
+      titulo: z.string().describe("Título do afazer (obrigatório)."),
+      notas: z.string().optional().describe("Notas opcionais."),
+      dificuldade: dificuldadeSchema
+        .optional()
+        .describe("trivial|easy|medium|hard. Default: easy."),
+      data_limite: z.string().optional().describe("Data limite YYYY-MM-DD ou ISO."),
+      tags: z.array(z.string()).optional().describe("Lista de tags (nomes)."),
+      confirm: z
+        .boolean()
+        .optional()
+        .describe("Deve ser true para executar a criação. Ausente/false → apenas preview."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildTodoPreview(args);
+      if (args.confirm !== true) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  ...preview,
+                  message: "Nenhuma escrita executada. Passe confirm=true para criar.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const item = await client.createTodo(preview.payload);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ mode: "created", item }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
 async function main(): Promise<void> {
   loadConfig();
   const transport = new StdioServerTransport();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTodoPreview, resolveSlug, slugifyTitulo } from "./todo.js";
+import { buildTodoPreview, buildTodoUpdatePreview, resolveSlug, slugifyTitulo } from "./todo.js";
 
 describe("slugifyTitulo", () => {
   it("gera kebab-case sem acentos", () => {
@@ -23,20 +23,21 @@ describe("resolveSlug", () => {
 });
 
 describe("buildTodoPreview", () => {
-  it("monta payload válido com slug automático nas notas", () => {
+  it("monta payload válido com slug no alias (não nas notas)", () => {
     const preview = buildTodoPreview({ titulo: "  Comprar pão  " });
     expect(preview.mode).toBe("preview");
     expect(preview.item.slug).toBe("comprar-pao");
     expect(preview.payload).toEqual({
       type: "todo",
       text: "Comprar pão",
-      notes: "[slug:comprar-pao]",
+      notes: "",
+      alias: "comprar-pao",
       priority: 1,
     });
     expect(preview.item.dificuldade).toBe("easy");
   });
 
-  it("respeita slug informado e preserva notas", () => {
+  it("respeita slug informado e preserva notas sem marcador de slug", () => {
     const preview = buildTodoPreview({
       titulo: "Entregar relatório",
       slug: "relatorio-final",
@@ -46,10 +47,21 @@ describe("buildTodoPreview", () => {
       tags: ["trabalho"],
     });
     expect(preview.item.slug).toBe("relatorio-final");
-    expect(preview.payload.notes).toBe("cap. 2\n[slug:relatorio-final]");
+    expect(preview.payload.alias).toBe("relatorio-final");
+    expect(preview.payload.notes).toBe("cap. 2");
     expect(preview.payload.priority).toBe(2);
     expect(preview.payload.date).toBe("2026-08-01");
     expect(preview.payload.tags).toEqual(["trabalho"]);
+  });
+
+  it("remove marcador legado [slug:...] das notas", () => {
+    const preview = buildTodoPreview({
+      titulo: "Item",
+      slug: "item",
+      notas: "texto\n[slug:antigo]",
+    });
+    expect(preview.payload.notes).toBe("texto");
+    expect(preview.payload.alias).toBe("item");
   });
 
   it("falha sem título", () => {
@@ -64,5 +76,40 @@ describe("buildTodoPreview", () => {
 
   it("falha com tags inválidas", () => {
     expect(() => buildTodoPreview({ titulo: "x", tags: [""] })).toThrow(/Tag inválida/);
+  });
+});
+
+describe("buildTodoUpdatePreview", () => {
+  it("monta PUT parcial com alias e data", () => {
+    const preview = buildTodoUpdatePreview({
+      id: "todo-1",
+      titulo: "Novo título",
+      slug: "novo-titulo",
+      data_limite: "2026-08-10",
+      dificuldade: "medium",
+    });
+    expect(preview.id).toBe("todo-1");
+    expect(preview.payload).toEqual({
+      text: "Novo título",
+      alias: "novo-titulo",
+      date: "2026-08-10",
+      priority: 1.5,
+    });
+  });
+
+  it("remove marcador legado nas notas do update", () => {
+    const preview = buildTodoUpdatePreview({
+      id: "todo-1",
+      notas: "ok\n[slug:antigo]",
+    });
+    expect(preview.payload.notes).toBe("ok");
+  });
+
+  it("falha sem campos mutáveis", () => {
+    expect(() => buildTodoUpdatePreview({ id: "todo-1" })).toThrow(/Nenhum campo/);
+  });
+
+  it("falha sem id", () => {
+    expect(() => buildTodoUpdatePreview({ id: "  ", titulo: "x" })).toThrow(/id/);
   });
 });

@@ -93,6 +93,71 @@ pnpm start
 }
 ```
 
+### Hábito / diária (preview e criação)
+
+```json
+{
+  "name": "habitica_preview_habit",
+  "arguments": { "titulo": "Beber água", "up": true, "down": false }
+}
+```
+
+```json
+{
+  "name": "habitica_create_habit",
+  "arguments": { "titulo": "Beber água", "confirm": true }
+}
+```
+
+```json
+{
+  "name": "habitica_preview_daily",
+  "arguments": { "titulo": "Meditar", "frequencia": "daily", "every_x": 1 }
+}
+```
+
+```json
+{
+  "name": "habitica_create_daily",
+  "arguments": { "titulo": "Meditar", "confirm": true }
+}
+```
+
+### Update / delete
+
+```json
+{
+  "name": "habitica_update_habit",
+  "arguments": { "id": "<uuid>", "titulo": "Beber mais água", "confirm": true }
+}
+```
+
+```json
+{
+  "name": "habitica_update_todo",
+  "arguments": {
+    "id": "<uuid>",
+    "titulo": "Revisar notas do dia",
+    "data_limite": "2026-08-10",
+    "confirm": true
+  }
+}
+```
+
+```json
+{
+  "name": "habitica_update_daily",
+  "arguments": { "id": "<uuid>", "frequencia": "weekly", "every_x": 1, "confirm": true }
+}
+```
+
+```json
+{
+  "name": "habitica_delete_item",
+  "arguments": { "id": "<uuid>", "tipo": "todo", "confirm": true }
+}
+```
+
 ## Validação com MCP Inspector
 
 Requer `pnpm build` e `.env` preenchido. O wrapper carrega credenciais do `.env` sem imprimi-las.
@@ -118,11 +183,13 @@ Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no W
 
 1. Sem `.env` / variáveis: servidor falha cedo sem imprimir segredos.
 2. `habitica_list_items` retorna itens reais com variáveis válidas.
-3. `habitica_preview_todo` não chama API de escrita.
-4. `habitica_create_todo` sem `confirm` não cria; com `confirm: true` cria.
-5. `habitica_preview_day_plan` / `habitica_create_day_plan` respeitam limite e origem.
+3. `habitica_preview_todo` / `habitica_preview_habit` / `habitica_preview_daily` não chamam API de escrita.
+4. Tools de create/update sem `confirm` não mutam; com `confirm: true` mutam.
+5. `habitica_preview_day_plan` / `habitica_create_day_plan` respeitam limite, origem, alias e prazo do dia.
 6. `habitica_complete_todo` rejeita id que não é `todo`.
 7. Score de habit/daily exige `confirm` e mostra mensagem de risco no preview.
+8. `habitica_update_habit` / `habitica_update_daily` / `habitica_update_todo` validam tipo antes do PUT.
+9. `habitica_delete_item` exige `tipo` coincidente, mensagem de risco e `confirm: true`; `reward` rejeitado.
 
 ## Limites conhecidos
 
@@ -130,5 +197,8 @@ Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no W
 - `ativo=false` filtra `completed` no lado do cliente; a API pode omitir todos concluídos antigos em listagens padrão.
 - Tags no preview usam nomes; a API pode exigir IDs de tags existentes para aplicação real.
 - Duplicidade do plano do dia é heurística (título + marcador `[origem:...]` em notas).
+- Slug vira `alias` Habitica (único entre todas as tasks); conflito de alias retorna erro da API.
+- Diárias: recorrência mínima apenas (`frequency` daily|weekly + `everyX`); sem `days`/`startDate`/checklist neste corte.
+- Remoção é irreversível; não cobre `reward`.
 - Pontuação altera estatísticas do personagem (XP, ouro, HP, streak).
 - Este MCP não gerencia backlog de projeto — só execução diária.

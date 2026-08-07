@@ -6,11 +6,12 @@ Agentes consultam e (com confirmação explícita) alteram hábitos, diárias, a
 
 ## Status
 
-MVP amplo implementado (Sprints 1–12): tools MCP, docs operacionais, skill e plugins Codex/Cursor.
+MVP amplo implementado (Sprints 1–12). Incremento 8 entregue (CRUD hábitos/diárias, update de afazer, remoção tipada). Incremento 7 (Workers) adiado.
 
 | Camada               | Escopo                                                   |
 | -------------------- | -------------------------------------------------------- |
 | MVP amplo            | Incrementos 1–6 — ver [docs/backlog.md](docs/backlog.md) |
+| Pós-MVP              | Incremento 8 concluído; Incremento 7 adiado              |
 | MVP mínimo validável | Incremento 1 (somente leitura) — concluído               |
 
 ## Stack
@@ -34,6 +35,7 @@ Detalhes: [CONTEXT.md](CONTEXT.md).
 - Credenciais apenas em variáveis de ambiente (fora do repositório). Use `.env` local (gitignored) a partir de `.env.example`.
 - Nunca registrar tokens, cookies, `Authorization`, payloads sensíveis ou credenciais em notas, logs, exemplos ou testes.
 - Variáveis: `HABITICA_USER_ID`, `HABITICA_API_TOKEN`, `HABITICA_X_CLIENT`.
+- Política de reporte: [SECURITY.md](SECURITY.md).
 
 ## Quick start
 
@@ -68,16 +70,33 @@ Smoke: `pnpm exec tsx scripts/smoke-list.ts`
 
 ## Tools
 
+Escrita / pontuação / remoção exigem `confirm: true` (sem confirm = preview).
+
 | Tool                        | Função                   | Escrita         |
 | --------------------------- | ------------------------ | --------------- |
 | `habitica_list_items`       | Listar itens             | não             |
 | `habitica_preview_todo`     | Preview de afazer        | não             |
 | `habitica_create_todo`      | Criar afazer             | `confirm: true` |
+| `habitica_update_todo`      | Atualizar afazer         | `confirm: true` |
+| `habitica_preview_habit`    | Preview de hábito        | não             |
+| `habitica_create_habit`     | Criar hábito             | `confirm: true` |
+| `habitica_update_habit`     | Atualizar hábito         | `confirm: true` |
+| `habitica_preview_daily`    | Preview de diária        | não             |
+| `habitica_create_daily`     | Criar diária             | `confirm: true` |
+| `habitica_update_daily`     | Atualizar diária         | `confirm: true` |
 | `habitica_preview_day_plan` | Preview do plano do dia  | não             |
 | `habitica_create_day_plan`  | Criar lote do dia        | `confirm: true` |
 | `habitica_complete_todo`    | Concluir afazer          | `confirm: true` |
 | `habitica_score_habit`      | Pontuar hábito up/down   | `confirm: true` |
 | `habitica_score_daily`      | Concluir/desfazer diária | `confirm: true` |
+| `habitica_delete_item`      | Remover habit/daily/todo | `confirm: true` |
+
+## Contribuindo
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — setup, PRs e escopo
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — padrões de comunidade
+- [SECURITY.md](SECURITY.md) — vulnerabilidades (reporte privado)
+- [LICENSE](LICENSE) — MIT
 
 ## Documentação
 

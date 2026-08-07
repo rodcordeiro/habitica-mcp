@@ -157,6 +157,103 @@ export function buildTodoPreview(input: TodoInput): TodoPreviewResult {
   };
 }
 
+export interface TodoUpdateInput {
+  id: string;
+  titulo?: string;
+  slug?: string;
+  notas?: string;
+  dificuldade?: Dificuldade | string;
+  data_limite?: string;
+  tags?: string[];
+}
+
+/** Campos enviados no PUT de afazer (parcial). */
+export interface HabiticaTodoUpdatePayload {
+  text?: string;
+  notes?: string;
+  alias?: string;
+  priority?: number;
+  date?: string;
+  tags?: string[];
+}
+
+export interface TodoUpdatePreviewResult {
+  mode: "preview";
+  id: string;
+  payload: HabiticaTodoUpdatePayload;
+  item: {
+    tipo: "todo";
+    id: string;
+    titulo?: string;
+    slug?: string;
+    notas?: string;
+    dificuldade?: Dificuldade;
+    data_limite?: string | null;
+    tags?: string[];
+  };
+}
+
+/**
+ * Valida update parcial de afazer (exige id + pelo menos um campo mutável).
+ */
+export function buildTodoUpdatePreview(input: TodoUpdateInput): TodoUpdatePreviewResult {
+  const id = requireNonEmptyString(input.id, "id", 100);
+  const payload: HabiticaTodoUpdatePayload = {};
+  const item: TodoUpdatePreviewResult["item"] = { tipo: "todo", id };
+
+  if (input.titulo !== undefined) {
+    const titulo = requireNonEmptyString(input.titulo, "titulo", MAX_TITULO);
+    payload.text = titulo;
+    item.titulo = titulo;
+  }
+
+  if (input.slug !== undefined) {
+    const baseTitulo = item.titulo ?? "item";
+    const slug = resolveSlug(baseTitulo, input.slug);
+    payload.alias = slug;
+    item.slug = slug;
+  }
+
+  if (input.notas !== undefined) {
+    const notasBase = optionalString(input.notas, "notas", MAX_NOTAS) ?? "";
+    const notas = stripSlugMarkers(notasBase);
+    if (notas.length > MAX_NOTAS) {
+      throw new Error(`Campo notas excede ${MAX_NOTAS} caracteres.`);
+    }
+    payload.notes = notas;
+    item.notas = notas;
+  }
+
+  if (input.dificuldade !== undefined) {
+    const dificuldade = parseDificuldade(input.dificuldade);
+    payload.priority = dificuldadeToPriority(dificuldade);
+    item.dificuldade = dificuldade;
+  }
+
+  if (input.data_limite !== undefined) {
+    const dataLimite = optionalDate(input.data_limite);
+    if (!dataLimite) {
+      throw new Error("Campo data_limite inválido. Use YYYY-MM-DD ou ISO datetime.");
+    }
+    payload.date = dataLimite;
+    item.data_limite = dataLimite;
+  }
+
+  if (input.tags !== undefined) {
+    const tags = optionalTags(input.tags) ?? [];
+    payload.tags = tags;
+    item.tags = tags;
+  }
+
+  if (Object.keys(payload).length === 0) {
+    throw new Error(
+      "Nenhum campo para atualizar. Informe titulo, slug, notas, dificuldade, data_limite e/ou tags.",
+    );
+  }
+
+  return { mode: "preview", id, payload, item };
+}
+
 /** String obrigatória não vazia, com limite de tamanho. */
 export function requireNonEmptyString(value: unknown, field: string, max: number): string {
   if (typeof value !== "string" || value.trim().length === 0) {

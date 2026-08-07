@@ -134,6 +134,18 @@ pnpm start
 
 ```json
 {
+  "name": "habitica_update_todo",
+  "arguments": {
+    "id": "<uuid>",
+    "titulo": "Revisar notas do dia",
+    "data_limite": "2026-08-10",
+    "confirm": true
+  }
+}
+```
+
+```json
+{
   "name": "habitica_update_daily",
   "arguments": { "id": "<uuid>", "frequencia": "weekly", "every_x": 1, "confirm": true }
 }
@@ -176,7 +188,7 @@ Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no W
 5. `habitica_preview_day_plan` / `habitica_create_day_plan` respeitam limite, origem, alias e prazo do dia.
 6. `habitica_complete_todo` rejeita id que não é `todo`.
 7. Score de habit/daily exige `confirm` e mostra mensagem de risco no preview.
-8. `habitica_update_habit` / `habitica_update_daily` validam tipo antes do PUT.
+8. `habitica_update_habit` / `habitica_update_daily` / `habitica_update_todo` validam tipo antes do PUT.
 9. `habitica_delete_item` exige `tipo` coincidente, mensagem de risco e `confirm: true`; `reward` rejeitado.
 
 ## Limites conhecidos

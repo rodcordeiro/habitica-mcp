@@ -9,7 +9,7 @@ import { buildDailyPreview, buildDailyUpdatePreview } from "./habitica/daily.js"
 import { buildDayPlanPreview } from "./habitica/day-plan.js";
 import { buildDeletePreview } from "./habitica/delete.js";
 import { buildHabitPreview, buildHabitUpdatePreview } from "./habitica/habit.js";
-import { buildTodoPreview } from "./habitica/todo.js";
+import { buildTodoPreview, buildTodoUpdatePreview } from "./habitica/todo.js";
 import type { ItemTipo } from "./types.js";
 
 loadEnv();
@@ -169,6 +169,72 @@ server.registerTool(
           {
             type: "text" as const,
             text: JSON.stringify({ mode: "created", item, slug: preview.item.slug }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_update_todo",
+  {
+    description:
+      "Atualiza um afazer existente somente com confirm=true. Sem confirm, devolve preview do PUT. Valida tipo todo antes de escrever.",
+    inputSchema: {
+      id: z.string().describe("ID do afazer."),
+      titulo: z.string().optional().describe("Novo título."),
+      slug: z.string().optional().describe("Novo alias (kebab-case)."),
+      notas: z.string().optional().describe("Novas notas (sem marcador de slug)."),
+      dificuldade: dificuldadeSchema.optional(),
+      data_limite: z.string().optional().describe("Nova data limite YYYY-MM-DD ou ISO."),
+      tags: z.array(z.string()).optional().describe("Nova lista de tags (nomes)."),
+      confirm: z.boolean().optional().describe("true para executar o update."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildTodoUpdatePreview(args);
+      if (args.confirm !== true) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  ...preview,
+                  message: "Nenhuma escrita executada. Passe confirm=true para atualizar.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const before = await client.getTask(args.id);
+      if (before.tipo !== "todo") {
+        throw new Error(`Item ${args.id} não é um todo (tipo=${before.tipo}).`);
+      }
+      const item = await client.updateTask(
+        args.id,
+        preview.payload as unknown as Record<string, unknown>,
+      );
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ mode: "updated", before, item }, null, 2),
           },
         ],
       };

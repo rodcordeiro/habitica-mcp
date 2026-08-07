@@ -1,7 +1,17 @@
 ﻿# Structure
 
-src/habitica owns API mapping and tests; skills/plugins package agent integrations; docs cover operation and release.
+Checkout layout (factual):
 
-Primary entrypoints: src/index.ts, src/habitica/, src/config.ts, skills/, plugins/, docs/
+| Path                                                          | Ownership                                                       |
+| ------------------------------------------------------------- | --------------------------------------------------------------- |
+| `src/index.ts`                                                | MCP entry: `McpServer`, tool registration, stdio bootstrap      |
+| `src/config.ts`                                               | Env load + secret redaction                                     |
+| `src/types.ts`                                                | Shared domain types                                             |
+| `src/habitica/`                                               | Habitica API client, mappers, preview/build helpers, unit tests |
+| `skills/habitica-rpg/`                                        | Source Domain Skill for agents                                  |
+| `plugins/habitica-rpg-codex/`, `plugins/habitica-rpg-cursor/` | Host-specific skill bundles                                     |
+| `docs/`                                                       | Backlog, operations, release                                    |
+| `scripts/`                                                    | Smoke / inspect helpers                                         |
+| `CONTEXT.md`                                                  | Product glossary and boundaries                                 |
 
-Describe checkout facts here; do not clone generic Nero guidelines into this repo.
+No MCP `resources` or `prompts` capability registered in checkout (tools only).

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTodoPreview, resolveSlug, slugifyTitulo } from "./todo.js";
+import { buildTodoPreview, buildTodoUpdatePreview, resolveSlug, slugifyTitulo } from "./todo.js";
 
 describe("slugifyTitulo", () => {
   it("gera kebab-case sem acentos", () => {
@@ -76,5 +76,40 @@ describe("buildTodoPreview", () => {
 
   it("falha com tags inválidas", () => {
     expect(() => buildTodoPreview({ titulo: "x", tags: [""] })).toThrow(/Tag inválida/);
+  });
+});
+
+describe("buildTodoUpdatePreview", () => {
+  it("monta PUT parcial com alias e data", () => {
+    const preview = buildTodoUpdatePreview({
+      id: "todo-1",
+      titulo: "Novo título",
+      slug: "novo-titulo",
+      data_limite: "2026-08-10",
+      dificuldade: "medium",
+    });
+    expect(preview.id).toBe("todo-1");
+    expect(preview.payload).toEqual({
+      text: "Novo título",
+      alias: "novo-titulo",
+      date: "2026-08-10",
+      priority: 1.5,
+    });
+  });
+
+  it("remove marcador legado nas notas do update", () => {
+    const preview = buildTodoUpdatePreview({
+      id: "todo-1",
+      notas: "ok\n[slug:antigo]",
+    });
+    expect(preview.payload.notes).toBe("ok");
+  });
+
+  it("falha sem campos mutáveis", () => {
+    expect(() => buildTodoUpdatePreview({ id: "todo-1" })).toThrow(/Nenhum campo/);
+  });
+
+  it("falha sem id", () => {
+    expect(() => buildTodoUpdatePreview({ id: "  ", titulo: "x" })).toThrow(/id/);
   });
 });

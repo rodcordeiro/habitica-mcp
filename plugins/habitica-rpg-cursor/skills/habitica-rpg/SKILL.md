@@ -1,4 +1,4 @@
----
+﻿---
 name: habitica-rpg
 description: Use when managing daily execution items through Habitica via MCP tools. Prefer Habitica for daily commitment (habits, dailies, todos, rewards), never as a project backlog manager.
 ---
@@ -37,6 +37,13 @@ Linguagem de domínio: alinhar com `CONTEXT.md` do repositório (`Item de execu�
 - Args: `titulo` (obrigatório), `slug?` (kebab-case; se omitido, gerado do título), `notas?`, `dificuldade?` (`trivial|easy|medium|hard`), `data_limite?`, `tags?`; create também `confirm?`.
 - O `slug` preenche o **alias** da tarefa Habitica (`alias`); não vai nas notas.
 - Sem confirm: preview do payload. Com confirm: cria e devolve `Item de execução`.
+
+### `habitica_update_todo`
+
+- Quando: editar título/notas/dificuldade/prazo/tags/alias de um afazer existente.
+- Args: `id`, campos parciais (`titulo?`, `slug?`, `notas?`, `dificuldade?`, `data_limite?`, `tags?`), `confirm?`.
+- Valida tipo `todo` antes do PUT. Sem confirm: preview.
+- Não usar update no lugar de `habitica_complete_todo`.
 
 ### `habitica_preview_habit` / `habitica_create_habit`
 

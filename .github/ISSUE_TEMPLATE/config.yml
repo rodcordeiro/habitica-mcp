@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/rodcordeiro/habitica-mcp/security/advisories/new
+    about: Report a vulnerability privately (see SECURITY.md). Do not open a public issue.
+  - name: Operations / local setup
+    url: https://github.com/rodcordeiro/habitica-mcp/blob/main/docs/operations.md
+    about: Installation, env vars, and validation checklist.

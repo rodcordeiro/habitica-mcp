@@ -1,18 +1,30 @@
 {
   "name": "habitica-rpg",
-  "version": "0.1.0",
-  "description": "Habitica RPG tools and skills for daily execution workflows (Codex).",
+  "version": "0.2.0+codex.20260807213341",
+  "description": "Habitica daily execution: MCP tools + skill with confirm-gated writes.",
   "author": {
-    "name": "Rodrigo Cordeiro"
+    "name": "Rodrigo Cordeiro",
+    "url": "https://github.com/rodcordeiro"
   },
+  "homepage": "https://github.com/rodcordeiro/habitica-mcp",
+  "repository": "https://github.com/rodcordeiro/habitica-mcp",
+  "license": "MIT",
+  "keywords": ["habitica", "mcp", "productivity", "daily-execution"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Habitica RPG",
-    "shortDescription": "Use Habitica as a daily execution layer.",
-    "longDescription": "Provides skills and MCP tools to read and safely create Habitica execution items.",
+    "shortDescription": "Daily execution layer for Habitica via MCP.",
+    "longDescription": "Skills and MCP tools to list, create, update, score, plan, and delete Habitica habits, dailies, and todos. Writes require confirm:true; Habitica stays for daily commitment, not project backlog.",
     "developerName": "Rodrigo Cordeiro",
     "category": "Productivity",
-    "capabilities": ["Skills", "MCP", "Productivity"]
+    "capabilities": ["Skills", "MCP", "Productivity"],
+    "websiteURL": "https://github.com/rodcordeiro/habitica-mcp",
+    "brandColor": "#562B97",
+    "defaultPrompt": [
+      "List my active Habitica todos for today.",
+      "Preview a day plan from these titles, then create with confirm after I approve.",
+      "Score this Habitica habit up after I confirm."
+    ]
   }
 }

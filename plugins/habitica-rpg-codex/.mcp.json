@@ -1,11 +1,13 @@
 {
-  "habitica-rpg": {
-    "command": "node",
-    "args": ["../../dist/index.js"],
-    "env": {
-      "HABITICA_USER_ID": "${HABITICA_USER_ID}",
-      "HABITICA_API_TOKEN": "${HABITICA_API_TOKEN}",
-      "HABITICA_X_CLIENT": "${HABITICA_X_CLIENT}"
+  "mcpServers": {
+    "habitica": {
+      "command": "node",
+      "args": ["../../dist/index.js"],
+      "env": {
+        "HABITICA_USER_ID": "${HABITICA_USER_ID}",
+        "HABITICA_API_TOKEN": "${HABITICA_API_TOKEN}",
+        "HABITICA_X_CLIENT": "${HABITICA_X_CLIENT}"
+      }
     }
   }
 }

@@ -22,6 +22,8 @@ export interface HabiticaTodoCreatePayload {
   type: "todo";
   text: string;
   notes: string;
+  /** Alias da tarefa no Habitica (preenchido com o slug). */
+  alias: string;
   priority: number;
   date?: string;
   tags?: string[];
@@ -75,16 +77,17 @@ export function resolveSlug(titulo: string, slug?: string): string {
 }
 
 /**
- * Injeta/atualiza marcador [slug:...] nas notas.
+ * Remove marcadores legados [slug:...] das notas (slug passa a ir no alias).
  */
-export function appendSlugMarker(notas: string, slug: string): string {
-  const cleaned = notas.replace(SLUG_MARKER_RE, "").trim();
-  const marker = `[slug:${slug}]`;
-  return cleaned.length > 0 ? `${cleaned}\n${marker}` : marker;
+export function stripSlugMarkers(notas: string): string {
+  return notas
+    .replace(SLUG_MARKER_RE, "")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
 }
 
 /**
- * Extrai slug do marcador nas notas, se existir.
+ * Extrai slug do marcador legado nas notas, se existir.
  */
 export function extractSlugFromNotas(notas: string): string | null {
   const match = notas.match(/\[slug:([^\]]+)\]/);
@@ -92,16 +95,34 @@ export function extractSlugFromNotas(notas: string): string | null {
 }
 
 /**
+ * Data local atual no formato YYYY-MM-DD.
+ */
+export function todayLocalIsoDate(now: Date = new Date()): string {
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Extrai a primeira data YYYY-MM-DD embutida em um texto (ex.: origem do plano).
+ */
+export function extractIsoDateFromText(text: string): string | null {
+  const match = text.match(/\d{4}-\d{2}-\d{2}/);
+  return match?.[0] ?? null;
+}
+
+/**
  * Valida campos de afazer e monta o payload Habitica (sem chamar a API).
- * Todo afazer recebe `slug` (informado ou gerado do título) embutido nas notas.
+ * O slug vira o `alias` da tarefa; não é mais escrito nas notas.
  */
 export function buildTodoPreview(input: TodoInput): TodoPreviewResult {
   const titulo = requireNonEmptyString(input.titulo, "titulo", MAX_TITULO);
   const slug = resolveSlug(titulo, input.slug);
   const notasBase = optionalString(input.notas, "notas", MAX_NOTAS) ?? "";
-  const notas = appendSlugMarker(notasBase, slug);
+  const notas = stripSlugMarkers(notasBase);
   if (notas.length > MAX_NOTAS) {
-    throw new Error(`Campo notas excede ${MAX_NOTAS} caracteres após incluir o slug.`);
+    throw new Error(`Campo notas excede ${MAX_NOTAS} caracteres.`);
   }
   const dificuldade = parseDificuldade(input.dificuldade ?? "easy");
   const dataLimite = optionalDate(input.data_limite);
@@ -111,6 +132,7 @@ export function buildTodoPreview(input: TodoInput): TodoPreviewResult {
     type: "todo",
     text: titulo,
     notes: notas,
+    alias: slug,
     priority: dificuldadeToPriority(dificuldade),
   };
   if (dataLimite) {

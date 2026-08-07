@@ -78,8 +78,10 @@ server.registerTool(
       slug: z
         .string()
         .optional()
-        .describe("Slug kebab-case. Se omitido, é gerado automaticamente a partir do título."),
-      notas: z.string().optional().describe("Notas opcionais."),
+        .describe(
+          "Slug kebab-case → alias Habitica. Se omitido, é gerado automaticamente a partir do título.",
+        ),
+      notas: z.string().optional().describe("Notas opcionais (sem marcador de slug)."),
       dificuldade: dificuldadeSchema
         .optional()
         .describe("trivial|easy|medium|hard. Default: easy."),
@@ -109,14 +111,16 @@ server.registerTool(
   "habitica_create_todo",
   {
     description:
-      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna o mesmo preview de habitica_preview_todo. Sempre inclui slug (informado ou gerado do título).",
+      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna o mesmo preview de habitica_preview_todo. O slug (informado ou gerado) preenche o alias da tarefa.",
     inputSchema: {
       titulo: z.string().describe("Título do afazer (obrigatório)."),
       slug: z
         .string()
         .optional()
-        .describe("Slug kebab-case. Se omitido, é gerado automaticamente a partir do título."),
-      notas: z.string().optional().describe("Notas opcionais."),
+        .describe(
+          "Slug kebab-case → alias Habitica. Se omitido, é gerado automaticamente a partir do título.",
+        ),
+      notas: z.string().optional().describe("Notas opcionais (sem marcador de slug)."),
       dificuldade: dificuldadeSchema
         .optional()
         .describe("trivial|easy|medium|hard. Default: easy."),
@@ -175,8 +179,12 @@ server.registerTool(
   "habitica_preview_day_plan",
   {
     description:
-      "Recebe uma lista explícita de itens do dia e devolve preview de afazeres (sem escrita). Não importa backlog de projeto.",
+      "Recebe uma lista explícita de itens do dia e devolve preview de afazeres (sem escrita). Cada item recebe prazo no dia do plano e slug no alias. Não importa backlog de projeto.",
     inputSchema: {
+      data: z
+        .string()
+        .optional()
+        .describe("Dia do planejamento YYYY-MM-DD. Default: data na origem ou hoje local."),
       items: z
         .array(
           z.object({
@@ -185,6 +193,10 @@ server.registerTool(
             notas: z.string().optional(),
             origem: z.string().optional(),
             prioridade: z.enum(["baixa", "media", "alta"]).optional(),
+            data: z
+              .string()
+              .optional()
+              .describe("Prazo do item YYYY-MM-DD (sobrescreve data do plano)."),
           }),
         )
         .describe("Lista explícita de itens planejados para o dia."),
@@ -196,9 +208,9 @@ server.registerTool(
       openWorldHint: false,
     },
   },
-  async ({ items }) => {
+  async ({ items, data }) => {
     try {
-      const preview = buildDayPlanPreview(items);
+      const preview = buildDayPlanPreview(items, { data });
       return {
         content: [{ type: "text" as const, text: JSON.stringify(preview, null, 2) }],
       };
@@ -212,8 +224,12 @@ server.registerTool(
   "habitica_create_day_plan",
   {
     description:
-      "Cria um lote pequeno de afazeres do plano do dia somente com confirm=true. Resultado parcial por item.",
+      "Cria um lote pequeno de afazeres do plano do dia somente com confirm=true. Prazo = dia do plano; slug = alias. Resultado parcial por item.",
     inputSchema: {
+      data: z
+        .string()
+        .optional()
+        .describe("Dia do planejamento YYYY-MM-DD. Default: data na origem ou hoje local."),
       items: z
         .array(
           z.object({
@@ -222,6 +238,10 @@ server.registerTool(
             notas: z.string().optional(),
             origem: z.string().optional(),
             prioridade: z.enum(["baixa", "media", "alta"]).optional(),
+            data: z
+              .string()
+              .optional()
+              .describe("Prazo do item YYYY-MM-DD (sobrescreve data do plano)."),
           }),
         )
         .describe("Lista explícita de itens planejados para o dia."),
@@ -234,9 +254,9 @@ server.registerTool(
       openWorldHint: true,
     },
   },
-  async ({ items, confirm }) => {
+  async ({ items, data, confirm }) => {
     try {
-      const preview = buildDayPlanPreview(items);
+      const preview = buildDayPlanPreview(items, { data });
       if (confirm !== true) {
         return {
           content: [

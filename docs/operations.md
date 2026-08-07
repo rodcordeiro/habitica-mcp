@@ -120,7 +120,7 @@ Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no W
 2. `habitica_list_items` retorna itens reais com variáveis válidas.
 3. `habitica_preview_todo` não chama API de escrita.
 4. `habitica_create_todo` sem `confirm` não cria; com `confirm: true` cria.
-5. `habitica_preview_day_plan` / `habitica_create_day_plan` respeitam limite e origem.
+5. `habitica_preview_day_plan` / `habitica_create_day_plan` respeitam limite, origem, alias e prazo do dia.
 6. `habitica_complete_todo` rejeita id que não é `todo`.
 7. Score de habit/daily exige `confirm` e mostra mensagem de risco no preview.
 
@@ -130,5 +130,6 @@ Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no W
 - `ativo=false` filtra `completed` no lado do cliente; a API pode omitir todos concluídos antigos em listagens padrão.
 - Tags no preview usam nomes; a API pode exigir IDs de tags existentes para aplicação real.
 - Duplicidade do plano do dia é heurística (título + marcador `[origem:...]` em notas).
+- Slug vira `alias` Habitica (único entre todas as tasks); conflito de alias retorna erro da API.
 - Pontuação altera estatísticas do personagem (XP, ouro, HP, streak).
 - Este MCP não gerencia backlog de projeto — só execução diária.

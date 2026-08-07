@@ -34,15 +34,16 @@ Linguagem de domínio: alinhar com `CONTEXT.md` do repositório (`Item de execu�
 
 - Quando: criar um afazer único.
 - Args: `titulo` (obrigatório), `slug?` (kebab-case; se omitido, gerado do título), `notas?`, `dificuldade?` (`trivial|easy|medium|hard`), `data_limite?`, `tags?`; create também `confirm?`.
-- Sempre persiste `[slug:...]` nas notas do Habitica.
+- O `slug` preenche o **alias** da tarefa Habitica (`alias`); não vai nas notas.
 - Sem confirm: preview do payload. Com confirm: cria e devolve `Item de execução`.
 
 ### `habitica_preview_day_plan` / `habitica_create_day_plan`
 
 - Quando: materializar uma lista **já decidida** do dia (não importar backlog inteiro).
-- Args: `items[]` com `titulo`, `slug?`, `notas?`, `origem?`, `prioridade?` (`baixa|media|alta`); create também `confirm?`.
+- Args: `data?` (YYYY-MM-DD do dia), `items[]` com `titulo`, `slug?`, `notas?`, `origem?`, `prioridade?` (`baixa|media|alta`), `data?`; create também `confirm?`.
 - Limite de itens por chamada; duplicidade título+origem é rejeitada/ignorada.
-- Sempre marcar origem nas notas (`[origem:...]`) e slug (`[slug:...]`).
+- Sempre marcar origem nas notas (`[origem:...]`); slug vai no **alias**.
+- Prazo (`date`) = dia do plano: `data` do item → `data` do plano → data embutida na origem → hoje local.
 
 ### `habitica_complete_todo`
 

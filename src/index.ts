@@ -5,7 +5,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { loadConfig, redactSecrets } from "./config.js";
 import { HabiticaClient } from "./habitica/client.js";
+import { buildDailyPreview, buildDailyUpdatePreview } from "./habitica/daily.js";
 import { buildDayPlanPreview } from "./habitica/day-plan.js";
+import { buildDeletePreview } from "./habitica/delete.js";
+import { buildHabitPreview, buildHabitUpdatePreview } from "./habitica/habit.js";
 import { buildTodoPreview } from "./habitica/todo.js";
 import type { ItemTipo } from "./types.js";
 
@@ -502,6 +505,386 @@ server.registerTool(
           {
             type: "text" as const,
             text: JSON.stringify({ mode: "scored", before, direction: dir, score }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+const habitFields = {
+  titulo: z.string().describe("Título do hábito (obrigatório na criação)."),
+  slug: z
+    .string()
+    .optional()
+    .describe("Slug kebab-case → alias Habitica. Se omitido na criação, gerado do título."),
+  notas: z.string().optional().describe("Notas opcionais (sem marcador de slug)."),
+  dificuldade: dificuldadeSchema.optional().describe("trivial|easy|medium|hard. Default: easy."),
+  up: z.boolean().optional().describe("Botão positivo. Default: true."),
+  down: z.boolean().optional().describe("Botão negativo. Default: true."),
+};
+
+server.registerTool(
+  "habitica_preview_habit",
+  {
+    description:
+      "Monta o preview do payload para criar um hábito no Habitica, sem chamar a API de escrita.",
+    inputSchema: habitFields,
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildHabitPreview(args);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(preview, null, 2) }],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_create_habit",
+  {
+    description:
+      "Cria um hábito no Habitica somente com confirm=true. Sem confirmação, retorna preview. Slug → alias; up/down default true (pelo menos um).",
+    inputSchema: {
+      ...habitFields,
+      confirm: z
+        .boolean()
+        .optional()
+        .describe("Deve ser true para executar a criação. Ausente/false → apenas preview."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildHabitPreview(args);
+      if (args.confirm !== true) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  ...preview,
+                  message: "Nenhuma escrita executada. Passe confirm=true para criar.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const item = await client.createTask(preview.payload as unknown as Record<string, unknown>);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ mode: "created", item, slug: preview.item.slug }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_update_habit",
+  {
+    description:
+      "Atualiza um hábito existente somente com confirm=true. Sem confirm, devolve preview do PUT. Valida tipo habit antes de escrever.",
+    inputSchema: {
+      id: z.string().describe("ID do hábito."),
+      titulo: z.string().optional().describe("Novo título."),
+      slug: z.string().optional().describe("Novo alias (kebab-case)."),
+      notas: z.string().optional().describe("Novas notas (sem marcador de slug)."),
+      dificuldade: dificuldadeSchema.optional(),
+      up: z.boolean().optional().describe("Botão positivo (informe junto com down)."),
+      down: z.boolean().optional().describe("Botão negativo (informe junto com up)."),
+      confirm: z.boolean().optional().describe("true para executar o update."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildHabitUpdatePreview(args);
+      if (args.confirm !== true) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  ...preview,
+                  message: "Nenhuma escrita executada. Passe confirm=true para atualizar.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const before = await client.getTask(args.id);
+      if (before.tipo !== "habit") {
+        throw new Error(`Item ${args.id} não é um habit (tipo=${before.tipo}).`);
+      }
+      const item = await client.updateTask(
+        args.id,
+        preview.payload as unknown as Record<string, unknown>,
+      );
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ mode: "updated", before, item }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+const dailyFields = {
+  titulo: z.string().describe("Título da diária (obrigatório na criação)."),
+  slug: z
+    .string()
+    .optional()
+    .describe("Slug kebab-case → alias Habitica. Se omitido na criação, gerado do título."),
+  notas: z.string().optional().describe("Notas opcionais (sem marcador de slug)."),
+  dificuldade: dificuldadeSchema.optional().describe("trivial|easy|medium|hard. Default: easy."),
+  frequencia: z
+    .enum(["daily", "weekly"])
+    .optional()
+    .describe("Recorrência mínima. Default: daily. Sem days/startDate neste corte."),
+  every_x: z
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .describe("Intervalo da frequência (everyX). Default: 1."),
+};
+
+server.registerTool(
+  "habitica_preview_daily",
+  {
+    description:
+      "Monta o preview do payload para criar uma diária no Habitica (recorrência mínima: frequency + everyX), sem escrita.",
+    inputSchema: dailyFields,
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildDailyPreview(args);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(preview, null, 2) }],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_create_daily",
+  {
+    description:
+      "Cria uma diária no Habitica somente com confirm=true. Recorrência mínima (daily|weekly + every_x). Slug → alias.",
+    inputSchema: {
+      ...dailyFields,
+      confirm: z
+        .boolean()
+        .optional()
+        .describe("Deve ser true para executar a criação. Ausente/false → apenas preview."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildDailyPreview(args);
+      if (args.confirm !== true) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  ...preview,
+                  message: "Nenhuma escrita executada. Passe confirm=true para criar.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const item = await client.createTask(preview.payload as unknown as Record<string, unknown>);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ mode: "created", item, slug: preview.item.slug }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_update_daily",
+  {
+    description:
+      "Atualiza uma diária existente somente com confirm=true. Sem confirm, devolve preview do PUT. Valida tipo daily antes de escrever.",
+    inputSchema: {
+      id: z.string().describe("ID da diária."),
+      titulo: z.string().optional().describe("Novo título."),
+      slug: z.string().optional().describe("Novo alias (kebab-case)."),
+      notas: z.string().optional().describe("Novas notas (sem marcador de slug)."),
+      dificuldade: dificuldadeSchema.optional(),
+      frequencia: z.enum(["daily", "weekly"]).optional(),
+      every_x: z.number().int().min(1).optional(),
+      confirm: z.boolean().optional().describe("true para executar o update."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async (args) => {
+    try {
+      const preview = buildDailyUpdatePreview(args);
+      if (args.confirm !== true) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  ...preview,
+                  message: "Nenhuma escrita executada. Passe confirm=true para atualizar.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const before = await client.getTask(args.id);
+      if (before.tipo !== "daily") {
+        throw new Error(`Item ${args.id} não é um daily (tipo=${before.tipo}).`);
+      }
+      const item = await client.updateTask(
+        args.id,
+        preview.payload as unknown as Record<string, unknown>,
+      );
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ mode: "updated", before, item }, null, 2),
+          },
+        ],
+      };
+    } catch (err) {
+      return toolError(err);
+    }
+  },
+);
+
+server.registerTool(
+  "habitica_delete_item",
+  {
+    description:
+      "Remove permanentemente um habit|daily|todo somente com confirm=true. Valida tipo antes do DELETE. Reward fora de escopo. Irreversível.",
+    inputSchema: {
+      id: z.string().describe("ID do item de execução."),
+      tipo: z
+        .enum(["habit", "daily", "todo"])
+        .describe("Tipo esperado (deve coincidir com a API)."),
+      confirm: z.boolean().optional().describe("true para excluir permanentemente."),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  async ({ id, tipo, confirm }) => {
+    try {
+      const config = loadConfig();
+      const client = new HabiticaClient(config);
+      const fetched = await client.getTask(id);
+      const preview = buildDeletePreview(id, tipo, fetched);
+      if (confirm !== true) {
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify(preview, null, 2) }],
+        };
+      }
+      const result = await client.deleteTask(id);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                mode: "deleted",
+                ...result,
+                before: preview.item,
+                risk: preview.risk,
+              },
+              null,
+              2,
+            ),
           },
         ],
       };

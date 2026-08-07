@@ -157,7 +157,8 @@ export function buildTodoPreview(input: TodoInput): TodoPreviewResult {
   };
 }
 
-function requireNonEmptyString(value: unknown, field: string, max: number): string {
+/** String obrigatória não vazia, com limite de tamanho. */
+export function requireNonEmptyString(value: unknown, field: string, max: number): string {
   if (typeof value !== "string" || value.trim().length === 0) {
     throw new Error(`Campo obrigatório ausente ou vazio: ${field}.`);
   }
@@ -168,7 +169,8 @@ function requireNonEmptyString(value: unknown, field: string, max: number): stri
   return trimmed;
 }
 
-function optionalString(value: unknown, field: string, max: number): string | undefined {
+/** String opcional; vazio/null → undefined. */
+export function optionalString(value: unknown, field: string, max: number): string | undefined {
   if (value === undefined || value === null || value === "") {
     return undefined;
   }

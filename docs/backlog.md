@@ -20,8 +20,9 @@ Linguagem de domínio: ver [CONTEXT.md](../CONTEXT.md).
 
 Implementação do MVP amplo concluída (Sprints 1–12).
 
-- **Concluído:** Sprints 1–12 (tools MCP, docs, skill e plugins Codex/Cursor).
-- **Pós-MVP (planejado):** Incremento 7 — MCP remoto single-user via Cloudflare Workers (acesso mobile).
+- **Concluído:** Sprints 1–12 (tools MCP, docs, skill e plugins Codex/Cursor); Incremento 8 (Sprints 16–18) — CRUD hábitos/diárias e remoção.
+- **Pós-MVP ativo:** Incremento 8 (entregue 2026-08-07).
+- **Adiado / ignorado por hora:** Incremento 7 — MCP remoto single-user via Cloudflare Workers (acesso mobile).
 - **MVP amplo:** Incrementos 1–6 (todo este backlog), entrega faseada.
 - **MVP mínimo validável:** Incremento 1 (Sprints 1–2) — leitura ponta a ponta.
 - Stack: Node.js, TypeScript, `@modelcontextprotocol/sdk`, transporte stdio, pnpm.
@@ -291,6 +292,8 @@ Critério de aceite: nos dois hosts, instalar o plugin disponibiliza skill + MCP
 
 ### Incremento 7 — MCP remoto (Cloudflare Workers, single-user)
 
+**Status:** Adiado / ignorado por hora
+
 Objetivo: disponibilizar o mesmo MCP via HTTPS para acesso fora do desktop (ex.: celular no Cursor), sem exigir Node.js local, mantendo modelo single-user e reutilizando o núcleo de tools existente.
 
 Contexto: o transporte stdio atual exige processo local (`node dist/index.js`). Em dispositivos móveis isso não escala; um Worker remoto com Streamable HTTP permite configurar apenas URL + Bearer no `mcp.json`.
@@ -364,3 +367,61 @@ Menor entregável validável: uso recorrente no celular com checklist de seguran
 6. Checklist de release remoto: deploy, teste mobile, monitoramento de erros 401/429/5xx.
 
 Critério de aceite: documentação permite configurar o MCP remoto no celular sem Node local; checklist cobre segurança, validação mobile e rollback; modo stdio local permanece suportado para desenvolvimento.
+
+### Incremento 8 — CRUD de hábitos/diárias e remoção
+
+**Status:** Concluída (2026-08-07)
+
+Objetivo: completar o ciclo de vida dos itens de execução no MCP — criar/editar hábitos e diárias (hoje só listar/pontuar) e permitir remoção explícita de hábitos, diárias e afazeres — sempre com preview e `confirm: true`.
+
+Contexto: hábitos e diárias já têm `habitica_list_items` e `habitica_score_*`; afazeres têm criação/plano/conclusão, mas não há edição nem exclusão. Sem remoção, o agente não consegue limpar itens errados ou obsoletos sem sair do MCP.
+
+Decisões de recorte:
+
+- Manter o mesmo padrão de segurança das tools atuais: preview por padrão; mutação só com `confirm: true`.
+- Slug/alias: reutilizar a regra vigente (slug → `alias` Habitica; não gravar `[slug:...]` nas notas).
+- Remoção é irreversível na API Habitica (`DELETE /tasks/:id`); a tool deve validar tipo e exigir confirmação explícita, com mensagem de risco.
+- Não incluir criação/edição/remoção de `reward` neste incremento (fora do pedido; avaliar depois).
+- Atualizar skill `habitica-rpg` e docs operacionais no mesmo incremento.
+
+#### Sprint 16 — Criar e editar hábitos
+
+**Status:** Concluída (2026-08-07)
+
+Menor entregável validável: o agente consegue preview e criar/atualizar um `habit` com confirmação explícita.
+
+1. Criar `habitica_preview_habit` / `habitica_create_habit` com contrato mínimo (`titulo`, `slug?`, `notas?`, `dificuldade?`, botões `up`/`down` quando suportado pela API).
+2. Criar `habitica_preview_update_habit` / `habitica_update_habit` exigindo `id` + campos mutáveis + `confirm: true`.
+3. Mapear payload ↔ `Item de execução`; validar tipo `habit` antes de update.
+4. Testes offline de preview, confirm gate, validação e erros de tipo/id.
+5. Documentar na skill: quando criar hábito vs. pontuar hábito existente.
+
+Critério de aceite: criação e edição de hábito só ocorrem com `confirm: true`; sem confirmação nenhuma escrita; listagem/score existentes não regridem.
+
+#### Sprint 17 — Criar e editar diárias
+
+**Status:** Concluída (2026-08-07)
+
+Menor entregável validável: o agente consegue preview e criar/atualizar um `daily` com confirmação explícita.
+
+1. Criar `habitica_preview_daily` / `habitica_create_daily` com contrato mínimo (`titulo`, `slug?`, `notas?`, `dificuldade?`, frequência/recorrência mínima segura da API).
+2. Criar `habitica_preview_update_daily` / `habitica_update_daily` exigindo `id` + campos mutáveis + `confirm: true`.
+3. Evitar expor configuração de recorrência complexa além do necessário no primeiro corte; documentar limites.
+4. Testes offline de preview, confirm gate, validação e erros de tipo/id.
+5. Documentar na skill: quando criar diária vs. pontuar/desfazer diária existente.
+
+Critério de aceite: criação e edição de diária só ocorrem com `confirm: true`; frequência básica funciona; score de diária existente permanece estável.
+
+#### Sprint 18 — Remover hábitos, diárias e afazeres
+
+**Status:** Concluída (2026-08-07)
+
+Menor entregável validável: o agente remove um item existente (`habit` | `daily` | `todo`) somente com confirmação explícita e validação de tipo.
+
+1. Criar `habitica_preview_delete_item` / `habitica_delete_item` (ou tools tipadas `habitica_delete_habit|daily|todo`) com `id`, `tipo` esperado e `confirm: true`.
+2. Validar que o item existe e que o tipo informado coincide com o da API antes do `DELETE`.
+3. Retornar preview com título/tipo e mensagem de risco (remoção irreversível); sem `confirm` não chamar a API.
+4. Testes offline: preview, confirm, tipo incorreto, id inexistente, sucesso simulado.
+5. Atualizar skill, `docs/operations.md` e checklist: remoção nunca por acidente; não usar remoção como substituto de concluir/pontuar.
+
+Critério de aceite: remoção só com `confirm: true` e tipo validado; hábitos, diárias e afazeres cobertos; rewards fora de escopo neste sprint.

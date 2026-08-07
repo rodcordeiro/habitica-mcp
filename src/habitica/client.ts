@@ -36,7 +36,11 @@ export class HabiticaClient {
     };
   }
 
-  private async request<T>(path: string, init?: RequestInit): Promise<T> {
+  private async request<T>(
+    path: string,
+    init?: RequestInit,
+    options?: { allowMissingData?: boolean },
+  ): Promise<T> {
     let response: Response;
     try {
       response = await fetch(`${BASE_URL}${path}`, {
@@ -93,6 +97,9 @@ export class HabiticaClient {
     }
 
     if (body?.data === undefined) {
+      if (options?.allowMissingData) {
+        return { deleted: true } as T;
+      }
       throw new HabiticaApiError(
         "Resposta Habitica sem campo data.",
         response.status,
@@ -131,12 +138,37 @@ export class HabiticaClient {
     return mapTaskToItem(data);
   }
 
-  async createTodo(payload: HabiticaTodoCreatePayload): Promise<ItemExecucao> {
+  /** POST genérico /tasks/user (habit, daily, todo, …). */
+  async createTask(payload: Record<string, unknown>): Promise<ItemExecucao> {
     const data = await this.request<HabiticaTask>("/tasks/user", {
       method: "POST",
       body: JSON.stringify(payload),
     });
     return mapTaskToItem(data);
+  }
+
+  async createTodo(payload: HabiticaTodoCreatePayload): Promise<ItemExecucao> {
+    return this.createTask(payload as unknown as Record<string, unknown>);
+  }
+
+  async updateTask(id: string, payload: Record<string, unknown>): Promise<ItemExecucao> {
+    const data = await this.request<HabiticaTask>(`/tasks/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    return mapTaskToItem(data);
+  }
+
+  /**
+   * DELETE /tasks/:id. Habitica pode omitir `data` em sucesso — retorna sentinel.
+   */
+  async deleteTask(id: string): Promise<{ deleted: true; id: string }> {
+    await this.request<{ deleted: true }>(
+      `/tasks/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+      { allowMissingData: true },
+    );
+    return { deleted: true, id };
   }
 
   async scoreTask(id: string, direction: "up" | "down"): Promise<unknown> {

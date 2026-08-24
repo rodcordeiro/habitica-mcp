@@ -68,25 +68,42 @@ describe("HabiticaClient.resolveTags", () => {
   });
 
   it("substitui nomes por IDs no payload e omite tags quando nenhum nome existe", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockImplementation(() =>
-          Promise.resolve(
-            new Response(
-              JSON.stringify({ success: true, data: [{ id: "tag-vault", name: "Vault" }] }),
-              { status: 200 },
-            ),
+    const fetchMock = vi.fn((input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith("/tags")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({ success: true, data: [{ id: "tag-vault", name: "Vault" }] }),
+            { status: 200 },
           ),
+        );
+      }
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            success: true,
+            data: { id: "todo-1", type: "todo", text: "Teste", notes: "", priority: 1 },
+          }),
+          { status: init?.method === "PUT" ? 200 : 201 },
         ),
-    );
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
     const client = new HabiticaClient(config);
-    const resolvedPayload: { tags?: string[] } = { tags: ["vault"] };
+    const resolvedPayload = {
+      type: "todo" as const,
+      text: "Teste",
+      notes: "",
+      alias: "teste",
+      priority: 1,
+      tags: ["vault"],
+    };
     const unknownPayload: { tags?: string[] } = { tags: ["missing"] };
 
     const resolvedWarnings = await client.resolveTaskTags(resolvedPayload, ["vault"]);
+    await client.createTodo(resolvedPayload);
     const unknownWarnings = await client.resolveTaskTags(unknownPayload, ["missing"]);
+    await client.updateTask("todo-1", unknownPayload);
 
     expect(resolvedPayload.tags).toEqual(["tag-vault"]);
     expect(resolvedWarnings).toEqual([]);
@@ -94,5 +111,9 @@ describe("HabiticaClient.resolveTags", () => {
     expect(unknownWarnings).toEqual([
       { tag: "missing", reason: "Etiqueta não encontrada; ignorada." },
     ]);
+    const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST");
+    const put = fetchMock.mock.calls.find(([, init]) => init?.method === "PUT");
+    expect(JSON.parse(String(post?.[1]?.body))).toMatchObject({ tags: ["tag-vault"] });
+    expect(JSON.parse(String(put?.[1]?.body))).not.toHaveProperty("tags");
   });
 });

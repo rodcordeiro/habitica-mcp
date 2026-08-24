@@ -193,6 +193,25 @@ export class HabiticaClient {
     return { tagIds, warnings };
   }
 
+  /** Resolve etiquetas e deixa no payload somente IDs válidos para escrita. */
+  async resolveTaskTags(
+    payload: { tags?: string[] },
+    requestedTags: string[],
+  ): Promise<TagResolutionWarning[]> {
+    if (requestedTags.length === 0) {
+      payload.tags = [];
+      return [];
+    }
+
+    const resolution = await this.resolveTags(requestedTags);
+    if (resolution.tagIds.length > 0) {
+      payload.tags = resolution.tagIds;
+    } else {
+      delete payload.tags;
+    }
+    return resolution.warnings;
+  }
+
   /** POST genérico /tasks/user (habit, daily, todo, …). */
   async createTask(payload: Record<string, unknown>): Promise<ItemExecucao> {
     const data = await this.request<HabiticaTask>("/tasks/user", {

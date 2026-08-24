@@ -66,4 +66,33 @@ describe("HabiticaClient.resolveTags", () => {
       ],
     });
   });
+
+  it("substitui nomes por IDs no payload e omite tags quando nenhum nome existe", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockImplementation(() =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify({ success: true, data: [{ id: "tag-vault", name: "Vault" }] }),
+              { status: 200 },
+            ),
+          ),
+        ),
+    );
+    const client = new HabiticaClient(config);
+    const resolvedPayload: { tags?: string[] } = { tags: ["vault"] };
+    const unknownPayload: { tags?: string[] } = { tags: ["missing"] };
+
+    const resolvedWarnings = await client.resolveTaskTags(resolvedPayload, ["vault"]);
+    const unknownWarnings = await client.resolveTaskTags(unknownPayload, ["missing"]);
+
+    expect(resolvedPayload.tags).toEqual(["tag-vault"]);
+    expect(resolvedWarnings).toEqual([]);
+    expect(unknownPayload).not.toHaveProperty("tags");
+    expect(unknownWarnings).toEqual([
+      { tag: "missing", reason: "Etiqueta não encontrada; ignorada." },
+    ]);
+  });
 });

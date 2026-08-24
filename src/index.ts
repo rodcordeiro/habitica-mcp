@@ -35,16 +35,15 @@ function toolError(err: unknown) {
 
 /** Resolve nomes/IDs de etiquetas e substitui o payload pelos IDs aceitos pela API. */
 async function resolvePayloadTags(
-  client: HabiticaClient,
   payload: { tags?: string[] },
   requestedTags: string[] | undefined,
-): Promise<TagResolutionWarning[]> {
-  if (requestedTags === undefined) {
-    return [];
+): Promise<{ client?: HabiticaClient; warnings: TagResolutionWarning[] }> {
+  if (requestedTags === undefined || requestedTags.length === 0) {
+    return { warnings: [] };
   }
-  const resolution = await client.resolveTags(requestedTags);
-  payload.tags = resolution.tagIds;
-  return resolution.warnings;
+  const client = new HabiticaClient(loadConfig());
+  const warnings = await client.resolveTaskTags(payload, requestedTags);
+  return { client, warnings };
 }
 
 server.registerTool(
@@ -115,10 +114,7 @@ server.registerTool(
   async (args) => {
     try {
       const preview = buildTodoPreview(args);
-      const warnings =
-        args.tags === undefined || args.tags.length === 0
-          ? []
-          : await resolvePayloadTags(new HabiticaClient(loadConfig()), preview.payload, args.tags);
+      const { warnings } = await resolvePayloadTags(preview.payload, args.tags);
       return {
         content: [
           { type: "text" as const, text: JSON.stringify({ ...preview, warnings }, null, 2) },
@@ -164,15 +160,9 @@ server.registerTool(
   async (args) => {
     try {
       const preview = buildTodoPreview(args);
-      let client: HabiticaClient | undefined;
-      const warnings =
-        args.tags === undefined || args.tags.length === 0
-          ? []
-          : await resolvePayloadTags(
-              (client = new HabiticaClient(loadConfig())),
-              preview.payload,
-              args.tags,
-            );
+      const tagResolution = await resolvePayloadTags(preview.payload, args.tags);
+      let client = tagResolution.client;
+      const { warnings } = tagResolution;
       if (args.confirm !== true) {
         return {
           content: [
@@ -236,15 +226,9 @@ server.registerTool(
   async (args) => {
     try {
       const preview = buildTodoUpdatePreview(args);
-      let client: HabiticaClient | undefined;
-      const warnings =
-        args.tags === undefined || args.tags.length === 0
-          ? []
-          : await resolvePayloadTags(
-              (client = new HabiticaClient(loadConfig())),
-              preview.payload,
-              args.tags,
-            );
+      const tagResolution = await resolvePayloadTags(preview.payload, args.tags);
+      let client = tagResolution.client;
+      const { warnings } = tagResolution;
       if (args.confirm !== true) {
         return {
           content: [

@@ -37,6 +37,10 @@ _Evitar_: meta, rotina
 Item de execução usado como troca motivacional no Habitica, mapeado para o tipo `reward`.  
 _Evitar_: prêmio de projeto
 
+**Etiqueta do Habitica**
+Classificação externa associada a uma Task do Habitica e identificada por ID. Agentes podem referenciá-la por nome ou ID; referências inexistentes são ignoradas com evidência explícita.
+_Evitar_: marcador textual, categoria de projeto
+
 **Planejamento do dia**  
 Seleção de itens de execução que devem entrar no Habitica para orientar a execução diária.  
 _Evitar_: backlog do projeto, roadmap

@@ -41,10 +41,13 @@ pnpm start
   "arguments": {
     "titulo": "Revisar notas do dia",
     "dificuldade": "easy",
-    "notas": "origem:exemplo"
+    "notas": "origem:exemplo",
+    "tags": ["vault", "<tag-id>"]
   }
 }
 ```
+
+`tags` aceita nomes ou IDs. A tool consulta as etiquetas existentes e envia somente IDs no payload. Etiquetas inexistentes são ignoradas e retornadas em `warnings`; nomes duplicados aplicam todos os IDs correspondentes e também geram warning.
 
 ### Criação confirmada
 
@@ -195,7 +198,7 @@ Args aninhados (ex.: `items` em day plan) são frágeis no CLI do Inspector no W
 
 - Rate limit da API Habitica (HTTP 429): aguardar e retry manual.
 - `ativo=false` filtra `completed` no lado do cliente; a API pode omitir todos concluídos antigos em listagens padrão.
-- Tags no preview usam nomes; a API pode exigir IDs de tags existentes para aplicação real.
+- Tags no preview aceitam nomes ou IDs e são resolvidas para IDs existentes antes da escrita; confira `warnings` para etiquetas ignoradas ou nomes ambíguos.
 - Duplicidade do plano do dia é heurística (título + marcador `[origem:...]` em notas).
 - Slug vira `alias` Habitica (único entre todas as tasks); conflito de alias retorna erro da API.
 - Diárias: recorrência mínima apenas (`frequency` daily|weekly + `everyX`); sem `days`/`startDate`/checklist neste corte.

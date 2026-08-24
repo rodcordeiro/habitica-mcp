@@ -55,6 +55,7 @@ Domain language: `CONTEXT.md` (`Item de execução`, `Afazer`, `Diária`, `Hábi
 - **Day plan notes**: keep `[origem:...]`; never import full project backlogs.
 - **Updates**: partial fields; validate type before PUT. Do not use update instead of complete/score.
 - **Delete**: require `id` + expected `tipo`; abort on type mismatch.
+- **Todo tags**: accept names or IDs; previews resolve them to existing IDs. Check `warnings` for missing tags (ignored) or duplicate names (all matches applied).
 
 ## Tools (compact)
 

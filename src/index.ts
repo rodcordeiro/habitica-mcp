@@ -4,7 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { loadConfig, redactSecrets } from "./config.js";
-import { HabiticaClient } from "./habitica/client.js";
+import { HabiticaClient, type TagResolutionWarning } from "./habitica/client.js";
 import { buildDailyPreview, buildDailyUpdatePreview } from "./habitica/daily.js";
 import { buildDayPlanPreview } from "./habitica/day-plan.js";
 import { buildDeletePreview } from "./habitica/delete.js";
@@ -31,6 +31,20 @@ function toolError(err: unknown) {
     content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
     isError: true as const,
   };
+}
+
+/** Resolve nomes/IDs de etiquetas e substitui o payload pelos IDs aceitos pela API. */
+async function resolvePayloadTags(
+  client: HabiticaClient,
+  payload: { tags?: string[] },
+  requestedTags: string[] | undefined,
+): Promise<TagResolutionWarning[]> {
+  if (requestedTags === undefined) {
+    return [];
+  }
+  const resolution = await client.resolveTags(requestedTags);
+  payload.tags = resolution.tagIds;
+  return resolution.warnings;
 }
 
 server.registerTool(
@@ -75,7 +89,7 @@ server.registerTool(
   "habitica_preview_todo",
   {
     description:
-      "Monta o preview do payload para criar um afazer (todo) no Habitica, sem chamar a API de escrita.",
+      "Monta o preview do payload para criar um afazer (todo) no Habitica, sem escrita. Nomes ou IDs de etiquetas são resolvidos para IDs existentes; etiquetas inexistentes são ignoradas com warning.",
     inputSchema: {
       titulo: z.string().describe("Título do afazer (obrigatório)."),
       slug: z
@@ -89,20 +103,26 @@ server.registerTool(
         .optional()
         .describe("trivial|easy|medium|hard. Default: easy."),
       data_limite: z.string().optional().describe("Data limite YYYY-MM-DD ou ISO."),
-      tags: z.array(z.string()).optional().describe("Lista de tags (nomes)."),
+      tags: z.array(z.string()).optional().describe("Lista de etiquetas (nomes ou IDs)."),
     },
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,
       idempotentHint: true,
-      openWorldHint: false,
+      openWorldHint: true,
     },
   },
   async (args) => {
     try {
       const preview = buildTodoPreview(args);
+      const warnings =
+        args.tags === undefined || args.tags.length === 0
+          ? []
+          : await resolvePayloadTags(new HabiticaClient(loadConfig()), preview.payload, args.tags);
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(preview, null, 2) }],
+        content: [
+          { type: "text" as const, text: JSON.stringify({ ...preview, warnings }, null, 2) },
+        ],
       };
     } catch (err) {
       return toolError(err);
@@ -114,7 +134,7 @@ server.registerTool(
   "habitica_create_todo",
   {
     description:
-      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna o mesmo preview de habitica_preview_todo. O slug (informado ou gerado) preenche o alias da tarefa.",
+      "Cria um afazer no Habitica somente com confirm=true. Sem confirmação, retorna preview. O slug preenche o alias; nomes ou IDs de etiquetas são resolvidos, e inexistentes são ignoradas com warning.",
     inputSchema: {
       titulo: z.string().describe("Título do afazer (obrigatório)."),
       slug: z
@@ -128,7 +148,7 @@ server.registerTool(
         .optional()
         .describe("trivial|easy|medium|hard. Default: easy."),
       data_limite: z.string().optional().describe("Data limite YYYY-MM-DD ou ISO."),
-      tags: z.array(z.string()).optional().describe("Lista de tags (nomes)."),
+      tags: z.array(z.string()).optional().describe("Lista de etiquetas (nomes ou IDs)."),
       confirm: z
         .boolean()
         .optional()
@@ -144,6 +164,15 @@ server.registerTool(
   async (args) => {
     try {
       const preview = buildTodoPreview(args);
+      let client: HabiticaClient | undefined;
+      const warnings =
+        args.tags === undefined || args.tags.length === 0
+          ? []
+          : await resolvePayloadTags(
+              (client = new HabiticaClient(loadConfig())),
+              preview.payload,
+              args.tags,
+            );
       if (args.confirm !== true) {
         return {
           content: [
@@ -152,6 +181,7 @@ server.registerTool(
               text: JSON.stringify(
                 {
                   ...preview,
+                  warnings,
                   message: "Nenhuma escrita executada. Passe confirm=true para criar.",
                 },
                 null,
@@ -161,14 +191,17 @@ server.registerTool(
           ],
         };
       }
-      const config = loadConfig();
-      const client = new HabiticaClient(config);
+      client ??= new HabiticaClient(loadConfig());
       const item = await client.createTodo(preview.payload);
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify({ mode: "created", item, slug: preview.item.slug }, null, 2),
+            text: JSON.stringify(
+              { mode: "created", item, slug: preview.item.slug, warnings },
+              null,
+              2,
+            ),
           },
         ],
       };
@@ -182,7 +215,7 @@ server.registerTool(
   "habitica_update_todo",
   {
     description:
-      "Atualiza um afazer existente somente com confirm=true. Sem confirm, devolve preview do PUT. Valida tipo todo antes de escrever.",
+      "Atualiza um afazer existente somente com confirm=true. Sem confirm, devolve preview do PUT. Valida tipo todo; resolve nomes ou IDs de etiquetas e evidencia as inexistentes ignoradas.",
     inputSchema: {
       id: z.string().describe("ID do afazer."),
       titulo: z.string().optional().describe("Novo título."),
@@ -190,7 +223,7 @@ server.registerTool(
       notas: z.string().optional().describe("Novas notas (sem marcador de slug)."),
       dificuldade: dificuldadeSchema.optional(),
       data_limite: z.string().optional().describe("Nova data limite YYYY-MM-DD ou ISO."),
-      tags: z.array(z.string()).optional().describe("Nova lista de tags (nomes)."),
+      tags: z.array(z.string()).optional().describe("Nova lista de etiquetas (nomes ou IDs)."),
       confirm: z.boolean().optional().describe("true para executar o update."),
     },
     annotations: {
@@ -203,6 +236,15 @@ server.registerTool(
   async (args) => {
     try {
       const preview = buildTodoUpdatePreview(args);
+      let client: HabiticaClient | undefined;
+      const warnings =
+        args.tags === undefined || args.tags.length === 0
+          ? []
+          : await resolvePayloadTags(
+              (client = new HabiticaClient(loadConfig())),
+              preview.payload,
+              args.tags,
+            );
       if (args.confirm !== true) {
         return {
           content: [
@@ -211,6 +253,7 @@ server.registerTool(
               text: JSON.stringify(
                 {
                   ...preview,
+                  warnings,
                   message: "Nenhuma escrita executada. Passe confirm=true para atualizar.",
                 },
                 null,
@@ -220,8 +263,7 @@ server.registerTool(
           ],
         };
       }
-      const config = loadConfig();
-      const client = new HabiticaClient(config);
+      client ??= new HabiticaClient(loadConfig());
       const before = await client.getTask(args.id);
       if (before.tipo !== "todo") {
         throw new Error(`Item ${args.id} não é um todo (tipo=${before.tipo}).`);
@@ -234,7 +276,7 @@ server.registerTool(
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify({ mode: "updated", before, item }, null, 2),
+            text: JSON.stringify({ mode: "updated", before, item, warnings }, null, 2),
           },
         ],
       };

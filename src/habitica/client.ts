@@ -24,6 +24,21 @@ interface HabiticaEnvelope<T> {
   message?: string;
 }
 
+interface HabiticaTag {
+  id: string;
+  name: string;
+}
+
+export interface TagResolutionWarning {
+  tag: string;
+  reason: string;
+}
+
+export interface TagResolutionResult {
+  tagIds: string[];
+  warnings: TagResolutionWarning[];
+}
+
 export class HabiticaClient {
   constructor(private readonly config: HabiticaConfig) {}
 
@@ -136,6 +151,46 @@ export class HabiticaClient {
   async getTask(id: string): Promise<ItemExecucao> {
     const data = await this.request<HabiticaTask>(`/tasks/${encodeURIComponent(id)}`);
     return mapTaskToItem(data);
+  }
+
+  /** Resolve nomes ou IDs de etiquetas para os IDs exigidos pela API de tasks. */
+  async resolveTags(tags: string[]): Promise<TagResolutionResult> {
+    if (tags.length === 0) {
+      return { tagIds: [], warnings: [] };
+    }
+
+    const availableTags = await this.request<HabiticaTag[]>("/tags");
+    if (!Array.isArray(availableTags)) {
+      throw new HabiticaApiError(
+        "Resposta Habitica: data de etiquetas não é uma lista.",
+        undefined,
+        "invalid_response",
+      );
+    }
+
+    const tagIds: string[] = [];
+    const warnings: TagResolutionWarning[] = [];
+    for (const requestedTag of tags) {
+      const normalized = requestedTag.toLocaleLowerCase();
+      const idMatch = availableTags.find((tag) => tag.id.toLocaleLowerCase() === normalized);
+      const matches = idMatch
+        ? [idMatch]
+        : availableTags.filter((tag) => tag.name.toLocaleLowerCase() === normalized);
+
+      if (matches.length === 0) {
+        warnings.push({ tag: requestedTag, reason: "Etiqueta não encontrada; ignorada." });
+        continue;
+      }
+      if (matches.length > 1) {
+        warnings.push({
+          tag: requestedTag,
+          reason: `Nome ambíguo; ${matches.length} etiquetas correspondentes foram aplicadas.`,
+        });
+      }
+      tagIds.push(...matches.map((tag) => tag.id));
+    }
+
+    return { tagIds, warnings };
   }
 
   /** POST genérico /tasks/user (habit, daily, todo, …). */

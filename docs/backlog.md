@@ -425,3 +425,19 @@ Menor entregável validável: o agente remove um item existente (`habit` | `dail
 5. Atualizar skill, `docs/operations.md` e checklist: remoção nunca por acidente; não usar remoção como substituto de concluir/pontuar.
 
 Critério de aceite: remoção só com `confirm: true` e tipo validado; hábitos, diárias e afazeres cobertos; rewards fora de escopo neste sprint.
+
+### Incremento 9 — Gerenciamento de etiquetas
+
+**Status:** Backlog
+
+Objetivo: permitir que agentes consultem e gerenciem etiquetas nativas do Habitica sem depender de outra integração.
+
+#### Sprint 19 — CRUD seguro de etiquetas
+
+1. Adicionar leitura de etiquetas com ID e nome.
+2. Adicionar criação e renomeação com preview e `confirm: true`.
+3. Adicionar remoção por ID com confirmação explícita e aviso de impacto nas Tasks associadas.
+4. Tratar nome duplicado e ID inexistente com resultados estruturados e acionáveis.
+5. Cobrir contratos, confirm gate e erros da API com testes offline; atualizar skill e documentação operacional.
+
+Critério de aceite: o agente lista etiquetas e executa criação, renomeação ou remoção somente após confirmação explícita; nenhuma credencial ou dado sensível aparece nas respostas.

@@ -102,6 +102,7 @@ describe("HabiticaClient.resolveTags", () => {
 
     const resolvedWarnings = await client.resolveTaskTags(resolvedPayload, ["vault"]);
     await client.createTodo(resolvedPayload);
+    await client.updateTask("todo-1", { tags: resolvedPayload.tags });
     const unknownWarnings = await client.resolveTaskTags(unknownPayload, ["missing"]);
     await client.updateTask("todo-1", unknownPayload);
 
@@ -112,8 +113,9 @@ describe("HabiticaClient.resolveTags", () => {
       { tag: "missing", reason: "Etiqueta não encontrada; ignorada." },
     ]);
     const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST");
-    const put = fetchMock.mock.calls.find(([, init]) => init?.method === "PUT");
+    const puts = fetchMock.mock.calls.filter(([, init]) => init?.method === "PUT");
     expect(JSON.parse(String(post?.[1]?.body))).toMatchObject({ tags: ["tag-vault"] });
-    expect(JSON.parse(String(put?.[1]?.body))).not.toHaveProperty("tags");
+    expect(JSON.parse(String(puts[0]?.[1]?.body))).toMatchObject({ tags: ["tag-vault"] });
+    expect(JSON.parse(String(puts[1]?.[1]?.body))).not.toHaveProperty("tags");
   });
 });

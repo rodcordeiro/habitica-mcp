@@ -1,0 +1,929 @@
+{
+  "schemaVersion": 1,
+  "target": {
+    "repoKey": "habitica-mcp",
+    "rootLabel": "habitica-mcp"
+  },
+  "builtAt": "2026-09-11T20:18:34.087Z",
+  "sourceFingerprint": "cfb46321dfa5a43b",
+  "extractorId": "typescript-ast",
+  "extractorVersion": "0.1.0",
+  "nodes": [
+    {
+      "id": "file:scripts/smoke-list.ts#smoke-list.ts",
+      "kind": "file",
+      "name": "smoke-list.ts",
+      "location": {
+        "file": "scripts/smoke-list.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/config.test.ts#config.test.ts",
+      "kind": "file",
+      "name": "config.test.ts",
+      "location": {
+        "file": "src/config.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/config.ts#config.ts",
+      "kind": "file",
+      "name": "config.ts",
+      "location": {
+        "file": "src/config.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/client.test.ts#client.test.ts",
+      "kind": "file",
+      "name": "client.test.ts",
+      "location": {
+        "file": "src/habitica/client.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/client.ts#client.ts",
+      "kind": "file",
+      "name": "client.ts",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/habitica/client.ts#HabiticaApiError",
+      "kind": "class",
+      "name": "HabiticaApiError",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 9
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/habitica/client.ts#HabiticaClient",
+      "kind": "class",
+      "name": "HabiticaClient",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 42
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#headers",
+      "kind": "method",
+      "name": "headers",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 45
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#request",
+      "kind": "method",
+      "name": "request",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 54
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#listTasks",
+      "kind": "method",
+      "name": "listTasks",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 133
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#getTask",
+      "kind": "method",
+      "name": "getTask",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 151
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#resolveTags",
+      "kind": "method",
+      "name": "resolveTags",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 157
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#resolveTaskTags",
+      "kind": "method",
+      "name": "resolveTaskTags",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 197
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#createTask",
+      "kind": "method",
+      "name": "createTask",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 216
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#createTodo",
+      "kind": "method",
+      "name": "createTodo",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 224
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#updateTask",
+      "kind": "method",
+      "name": "updateTask",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 228
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#deleteTask",
+      "kind": "method",
+      "name": "deleteTask",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 239
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "method:src/habitica/client.ts#scoreTask",
+      "kind": "method",
+      "name": "scoreTask",
+      "location": {
+        "file": "src/habitica/client.ts",
+        "line": 248
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/create-todo.test.ts#create-todo.test.ts",
+      "kind": "file",
+      "name": "create-todo.test.ts",
+      "location": {
+        "file": "src/habitica/create-todo.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/daily.test.ts#daily.test.ts",
+      "kind": "file",
+      "name": "daily.test.ts",
+      "location": {
+        "file": "src/habitica/daily.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/daily.ts#daily.ts",
+      "kind": "file",
+      "name": "daily.ts",
+      "location": {
+        "file": "src/habitica/daily.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/day-plan.test.ts#day-plan.test.ts",
+      "kind": "file",
+      "name": "day-plan.test.ts",
+      "location": {
+        "file": "src/habitica/day-plan.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/day-plan.ts#day-plan.ts",
+      "kind": "file",
+      "name": "day-plan.ts",
+      "location": {
+        "file": "src/habitica/day-plan.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/delete.test.ts#delete.test.ts",
+      "kind": "file",
+      "name": "delete.test.ts",
+      "location": {
+        "file": "src/habitica/delete.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/delete.ts#delete.ts",
+      "kind": "file",
+      "name": "delete.ts",
+      "location": {
+        "file": "src/habitica/delete.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/difficulty.ts#difficulty.ts",
+      "kind": "file",
+      "name": "difficulty.ts",
+      "location": {
+        "file": "src/habitica/difficulty.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/errors.test.ts#errors.test.ts",
+      "kind": "file",
+      "name": "errors.test.ts",
+      "location": {
+        "file": "src/habitica/errors.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/habit.test.ts#habit.test.ts",
+      "kind": "file",
+      "name": "habit.test.ts",
+      "location": {
+        "file": "src/habitica/habit.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/habit.ts#habit.ts",
+      "kind": "file",
+      "name": "habit.ts",
+      "location": {
+        "file": "src/habitica/habit.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/mapper.test.ts#mapper.test.ts",
+      "kind": "file",
+      "name": "mapper.test.ts",
+      "location": {
+        "file": "src/habitica/mapper.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/mapper.ts#mapper.ts",
+      "kind": "file",
+      "name": "mapper.ts",
+      "location": {
+        "file": "src/habitica/mapper.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/todo.test.ts#todo.test.ts",
+      "kind": "file",
+      "name": "todo.test.ts",
+      "location": {
+        "file": "src/habitica/todo.test.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "file",
+      "name": "todo.ts",
+      "location": {
+        "file": "src/habitica/todo.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/index.ts#index.ts",
+      "kind": "file",
+      "name": "index.ts",
+      "location": {
+        "file": "src/index.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/types.ts#types.ts",
+      "kind": "file",
+      "name": "types.ts",
+      "location": {
+        "file": "src/types.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    },
+    {
+      "id": "file:vitest.config.ts#vitest.config.ts",
+      "kind": "file",
+      "name": "vitest.config.ts",
+      "location": {
+        "file": "vitest.config.ts",
+        "line": 1
+      },
+      "language": "typescript"
+    }
+  ],
+  "edges": [
+    {
+      "from": "file:scripts/smoke-list.ts#smoke-list.ts",
+      "to": "file:src/config.ts#config.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "scripts/smoke-list.ts",
+        "line": 6
+      }
+    },
+    {
+      "from": "file:scripts/smoke-list.ts#smoke-list.ts",
+      "to": "file:src/habitica/client.ts#client.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "scripts/smoke-list.ts",
+        "line": 7
+      }
+    },
+    {
+      "from": "file:scripts/smoke-list.ts#smoke-list.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "scripts/smoke-list.ts",
+        "line": 8
+      }
+    },
+    {
+      "from": "file:src/config.test.ts#config.test.ts",
+      "to": "file:src/config.ts#config.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/config.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/client.test.ts#client.test.ts",
+      "to": "file:src/config.ts#config.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/client.test.ts#client.test.ts",
+      "to": "file:src/habitica/client.ts#client.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.test.ts",
+        "line": 3
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "file:src/config.ts#config.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "file:src/config.ts#config.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 3
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "file:src/habitica/mapper.ts#mapper.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 4
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 5
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "class:src/habitica/client.ts#HabiticaApiError",
+      "kind": "contains",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 9
+      }
+    },
+    {
+      "from": "file:src/habitica/client.ts#client.ts",
+      "to": "class:src/habitica/client.ts#HabiticaClient",
+      "kind": "contains",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 42
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#headers",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 45
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#request",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 54
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#listTasks",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 133
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#getTask",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 151
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#resolveTags",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 157
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#resolveTaskTags",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 197
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#createTask",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 216
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#createTodo",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 224
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#updateTask",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 228
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#deleteTask",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 239
+      }
+    },
+    {
+      "from": "class:src/habitica/client.ts#HabiticaClient",
+      "to": "method:src/habitica/client.ts#scoreTask",
+      "kind": "method",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/client.ts",
+        "line": 248
+      }
+    },
+    {
+      "from": "file:src/habitica/create-todo.test.ts#create-todo.test.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/create-todo.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/daily.test.ts#daily.test.ts",
+      "to": "file:src/habitica/daily.ts#daily.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/daily.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/daily.ts#daily.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/daily.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/daily.ts#daily.ts",
+      "to": "file:src/habitica/difficulty.ts#difficulty.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/daily.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/daily.ts#daily.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/daily.ts",
+        "line": 3
+      }
+    },
+    {
+      "from": "file:src/habitica/day-plan.test.ts#day-plan.test.ts",
+      "to": "file:src/habitica/day-plan.ts#day-plan.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/day-plan.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/day-plan.ts#day-plan.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/day-plan.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/delete.test.ts#delete.test.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/delete.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/delete.test.ts#delete.test.ts",
+      "to": "file:src/habitica/delete.ts#delete.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/delete.test.ts",
+        "line": 3
+      }
+    },
+    {
+      "from": "file:src/habitica/delete.ts#delete.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/delete.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/delete.ts#delete.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/delete.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/difficulty.ts#difficulty.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/difficulty.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/errors.test.ts#errors.test.ts",
+      "to": "file:src/habitica/client.ts#client.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/errors.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/habit.test.ts#habit.test.ts",
+      "to": "file:src/habitica/habit.ts#habit.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/habit.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/habit.ts#habit.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/habit.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/habit.ts#habit.ts",
+      "to": "file:src/habitica/difficulty.ts#difficulty.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/habit.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/habit.ts#habit.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/habit.ts",
+        "line": 3
+      }
+    },
+    {
+      "from": "file:src/habitica/mapper.test.ts#mapper.test.ts",
+      "to": "file:src/habitica/mapper.ts#mapper.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/mapper.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/mapper.ts#mapper.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/mapper.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/mapper.ts#mapper.ts",
+      "to": "file:src/habitica/difficulty.ts#difficulty.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/mapper.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/todo.test.ts#todo.test.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/todo.test.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/habitica/todo.ts#todo.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/todo.ts",
+        "line": 1
+      }
+    },
+    {
+      "from": "file:src/habitica/todo.ts#todo.ts",
+      "to": "file:src/habitica/difficulty.ts#difficulty.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/habitica/todo.ts",
+        "line": 2
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/config.ts#config.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 6
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/habitica/client.ts#client.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 7
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/habitica/daily.ts#daily.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 8
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/habitica/day-plan.ts#day-plan.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 9
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/habitica/delete.ts#delete.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 10
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/habitica/habit.ts#habit.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 11
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/habitica/todo.ts#todo.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 12
+      }
+    },
+    {
+      "from": "file:src/index.ts#index.ts",
+      "to": "file:src/types.ts#types.ts",
+      "kind": "imports",
+      "provenance": "EXTRACTED",
+      "evidence": {
+        "file": "src/index.ts",
+        "line": 13
+      }
+    }
+  ],
+  "stats": {
+    "nodeCount": 36,
+    "edgeCount": 55
+  }
+}
